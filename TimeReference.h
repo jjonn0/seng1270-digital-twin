@@ -35,19 +35,17 @@ class TimeReference
     }
     std::string getTimeStamp()
     {
-        auto floor_division([](auto x, auto y){
-            return size_t(floor(x / y));
-        });
-        size_t remaining_seconds{size_t(getRemainingSeconds())};
+        auto floor_division([](auto x, auto y){ return int(floor(x / y)); });
+        int remaining_seconds{getRemainingSeconds()};
         remaining_seconds = (remaining_seconds == 0 ? 0 : remaining_seconds);
-        size_t remaining_days{floor_division(remaining_seconds, 86400)};
+        int remaining_days{floor_division(remaining_seconds, 86400)};
         remaining_seconds -= remaining_days * 86400;
-        size_t remaining_hours{floor_division(remaining_seconds, 3600)};
+        int remaining_hours{floor_division(remaining_seconds, 3600)};
         remaining_seconds -= remaining_hours * 3600;
-        size_t remaining_minutes{floor_division(remaining_seconds, 60)};
+        int remaining_minutes{floor_division(remaining_seconds, 60)};
         remaining_seconds -= remaining_minutes * 60;
 
-        return std::format("{:<2}d {:<2}h {:<2}m {:<2}s", remaining_days, remaining_hours, remaining_minutes, remaining_seconds);
+        return std::format("{:0>2d}d:{:0>2d}h:{:0>2d}m:{:0>2d}s", remaining_days, remaining_hours, remaining_minutes, remaining_seconds);
     }
     void setRemainingSeconds(size_t seconds_until_expiration)
     {
@@ -56,6 +54,11 @@ class TimeReference
     void addRemainingSeconds(size_t additional_seconds_until_expiration)
     {
         expiration_since_unix += additional_seconds_until_expiration;
+    }
+    // Whether or not the time reference endpoint has been passed.
+    bool isPassed()
+    {
+        return (getRemainingSeconds() < 0 ? true : false);
     }
 };
 
