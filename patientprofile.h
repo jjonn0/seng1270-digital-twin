@@ -24,7 +24,7 @@ class PatientProfile : public Profile
      * @param profile_number    A number used to reference the patient profile. This must be created manually, cannot conflict with any other number, and cannot be changed after creation.
      * @param creation_date     The date that the original patient profile was created on.
      */
-    PatientProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", size_t age, time_t creation_date) : Profile(profile_number, first_name, last_name, age, creation_date) {}
+    PatientProfile(size_t profile_number, std::string first_name, std::string last_name, size_t age, time_t creation_date) : Profile(profile_number, first_name, last_name, age, creation_date) {}
     /**
      * @brief                           Default constructor for making a brand new patient profile.
      * @param profile_number            A number used to reference the patient profile. This must be created manually, cannot conflict with any other number, and cannot be changed after creation.
@@ -33,7 +33,7 @@ class PatientProfile : public Profile
      * @param m_time_of_admission       The time at which the patient was processed.
      * @param m_expected_time_of_stay   The time at which the patient is expected to have been discharged.
      */
-    PatientProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", size_t age, time_t creation_date, std::string reason_of_admission, time_t time_of_admission, time_t expected_time_of_stay) : 
+    PatientProfile(size_t profile_number, std::string first_name, std::string last_name, size_t age, time_t creation_date, std::string reason_of_admission, time_t time_of_admission, time_t expected_time_of_stay) : 
     Profile(profile_number, first_name, last_name, age, creation_date), m_reason_of_admission{reason_of_admission}, m_time_of_admission{time_of_admission}, m_expected_time_of_stay{expected_time_of_stay} {}
     ~PatientProfile() {}
 

@@ -16,7 +16,7 @@ class StaffProfile : public Profile
      * @brief                   Default constructor for making a brand new staff profile.
      * @param profile_number    A number used to reference the profile. This must be created manually, cannot conflict with any other number, and cannot be changed after creation.
      */
-    StaffProfile(size_t profile_number, std::string first_name, std::string last_name, size_t age) : Profile(profile_number, first_name, last_name, age) {}
+    StaffProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", size_t age = 0) : Profile(profile_number, first_name, last_name, age) {}
     /**
      * @brief                   Default constructor for making a brand new staff profile.
      * @param profile_number    A number used to reference the staff profile. This must be created manually, cannot conflict with any other number, and cannot be changed after creation.
