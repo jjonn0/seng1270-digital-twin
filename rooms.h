@@ -1,10 +1,9 @@
 #pragma once
-#include "patientprofile.h"
-#include "staffprofile.h"
 #include <iostream>
 #include <string>
 #include <format>
 #include <vector>
+#include "profiles.h"
 
 class Room
 {
