@@ -2,9 +2,7 @@
 #include <chrono>
 #include <typeinfo>
 #include <format>
-#include "profile.h"
-#include "patientprofile.h"
-#include "staffprofile.h"
+#include "profiles.h"
 using namespace std;
 
 time_t getTimestamp(size_t year, size_t month, size_t day, size_t hour, size_t minute, size_t second)
