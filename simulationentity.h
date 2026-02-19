@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <vector>
 #include <format>
@@ -7,7 +8,6 @@
 class SimulationEntity
 {
     private:
-    static int m_total_entities;
     PatientProfile m_patient_profile;
     StaffProfile m_staff_profile;
 
@@ -46,16 +46,22 @@ class SimulationEntity
             return std::format("Associated profiles: {} | {}", m_patient_profile.toString(), m_staff_profile.toString());
         }
     }
+    std::string toFormattedString()
+    {
+        if(getProfileType() == typeid(m_patient_profile).name())
+        {
+            return std::format("Found Patient Record:\n{}", m_patient_profile.toFormattedString());
+        }
+        else if(getProfileType() == typeid(m_staff_profile).name())
+        {
+            return std::format("Found Staff Record:\n{}", m_staff_profile.toFormattedString());
+        }
+        else
+        {
+            return std::format("Found Patient and Staff Record:\n{}\n{}", m_patient_profile.toFormattedString(), m_staff_profile.toFormattedString());
+        }
+    }
 
     void setPatientProfile(PatientProfile patient_profile) { m_patient_profile = patient_profile; }
     void setStaffProfile(StaffProfile staff_profile) { m_staff_profile = staff_profile; }
 };
-int SimulationEntity::m_total_entities{0};
-
-void printCurrentEntities(std::vector<SimulationEntity>& entity_list)
-{
-    for(SimulationEntity& e : entity_list)
-    {
-        std::cout << e.toString() << std::endl;
-    }
-}

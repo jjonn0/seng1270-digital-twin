@@ -15,11 +15,11 @@ class Profile
     
     void constructionMessage()
     {
-        std::cout << std::format("New profile #{} was created.\n", m_profile_number);
+        //std::cout << std::format("New profile #{} was created.\n", m_profile_number);
     }
     void destructionMessage()
     {
-        std::cout << std::format("Profile #{} was destroyed.\n", m_profile_number);
+        //std::cout << std::format("Profile #{} was destroyed.\n", m_profile_number);
     }
 
     public:
@@ -79,6 +79,14 @@ class PatientProfile : public Profile
     time_t getTimeOfAdmission() { return m_time_of_admission; }
     time_t getExpectedTimeOfStay() { return m_expected_time_of_stay; }
     std::string toString() { return std::format("{} {} {} {} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_age, m_creation_date, m_reason_of_admission, m_time_of_admission, m_expected_time_of_stay); }
+    std::string toFormattedString()
+    {
+        std::string profile_creation_date_string{ctime(&m_creation_date)};
+        std::string time_of_admission_string{ctime(&m_time_of_admission)};
+        std::string expected_time_of_stay_string{ctime(&m_expected_time_of_stay)};
+        return std::format("Profile Number: {:<20d} | Last Name: {:<20s} | First Name: {:<20s} | Age: {:<3d}\nProfile Creation Date: {:<s}Reason of Admission: {:<s}\nTime of Admission: {:<s}Expected Time of Stay: {:<s}",
+        m_profile_number, m_last_name, m_first_name, m_age, profile_creation_date_string, m_reason_of_admission, time_of_admission_string, expected_time_of_stay_string);
+    }
 
     void setReasonOfAdmission(std::string reason_of_admission) { m_reason_of_admission = reason_of_admission; }
     void setTimeOfAdmission(time_t time_of_admission) { m_time_of_admission = time_of_admission; }
@@ -111,6 +119,12 @@ class StaffProfile : public Profile
     std::string getRole() { return m_role; }
     size_t getWage() { return m_wage; }
     std::string toString() { return std::format("{} {} {} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_age, m_creation_date, m_role, m_wage); }
+    std::string toFormattedString()
+    {
+        std::string profile_creation_date_string{ctime(&m_creation_date)};
+        return std::format("Profile Number: {:<20d} | Last Name: {:<20s} | First Name: {:<20s} | Age: {:<3d}\nProfile Creation Date: {:<s}Role: {:<s}\nWage: {:<d}\n",
+        m_profile_number, m_last_name, m_first_name, m_age, profile_creation_date_string, m_role, m_wage);
+    }
 
     void setRole(std::string role) { m_role = role; }
     void setWage(size_t wage) { m_wage = wage; }

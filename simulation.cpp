@@ -3,6 +3,7 @@
 #include <format>
 #include <typeinfo>
 #include <string>
+#include <sstream>
 #include "profiles.h"
 #include "simulationentity.h"
 using namespace std;
@@ -11,7 +12,7 @@ vector<SimulationEntity> entity_list;
 
 time_t getTimestamp(size_t year, size_t month, size_t day, size_t hour, size_t minute, size_t second);
 void displayOptionsMenu(time_t current_time);
-void displayEntitiesMenu();
+void displayModifyEntitiesMenu();
 
 int main()
 {
@@ -31,7 +32,7 @@ int main()
         {
             try
             {
-                if(input == "1") {}
+                if(input == "1") { displayModifyEntitiesMenu(); }
                 else if(input == "2") {}
                 else if(input == "3") {}
                 else{ throw 200; }
@@ -63,14 +64,18 @@ time_t getTimestamp(size_t year, size_t month, size_t day, size_t hour, size_t m
 
 void displayOptionsMenu(time_t current_time)
 {
-    
     string modified_date_text{ctime(&current_time)};
     modified_date_text.erase(modified_date_text.size() - 1);
-    cout << format("{:<27s}{:>30s}\n\n{:<60s}\n{:<60s}\n{:<60s}\n{:<60s}\n\n>",
+    cout << format("\n{:<27s}{:>30s}\n\n{:<s}\n{:<s}\n{:<s}\n{:<s}\n\n>",
         "VitalVitals Simulation Menu", modified_date_text, "1 - Modify Entities", "2 - Status Update", "3 - Modify Current Time", "CTRL+Z - Exit");
 }
 
-void displayEntitiesMenu()
+void displayModifyEntitiesMenu()
 {
+    cout << "VitalVitals Entity Modification Menu\n\n";
 
+    for(SimulationEntity e : entity_list)
+    {
+        cout << e.toFormattedString() << endl;
+    }
 }
