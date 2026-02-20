@@ -44,11 +44,21 @@ class Profile
     size_t getAge() { return m_age; }
     time_t getCreationDate() { return m_creation_date; }
     size_t getProfileNumber() { return m_profile_number; }
+    virtual std::string getReasonOfAdmission() { return ""; }
+    virtual time_t getTimeOfAdmission() { return time_t(nullptr); }
+    virtual time_t getExpectedTimeOfStay() { return time_t(nullptr); }
+    virtual std::string getRole() { return ""; }
+    virtual size_t getWage() { return 0; }
     std::string toString() { return std::format("{} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_age, m_creation_date); }
 
     void setFirstName(std::string first_name) { m_first_name = first_name; }
     void setLastName(std::string last_name) { m_last_name = last_name; }
     void setAge(size_t age) { m_age = age; }
+    virtual void setReasonOfAdmission(std::string reason_of_admission) {}
+    virtual void setTimeOfAdmission(time_t time_of_admission) {}
+    virtual void setExpectedTimeOfStay(time_t expected_time_of_stay) {}
+    virtual void setRole(std::string role) {}
+    virtual void setWage(size_t wage) {}
 };
 
 class PatientProfile : public Profile
