@@ -20,11 +20,11 @@ class SimulationEntity
     {
         if(m_patient_profile.getProfileNumber() != 0 && m_staff_profile.getProfileNumber() == 0)
         {
-            return typeid(m_patient_profile).name();
+            return "Patient";
         }
         else if(m_patient_profile.getProfileNumber() == 0 && m_staff_profile.getProfileNumber() != 0)
         {
-            return typeid(m_staff_profile).name();
+            return "Staff";
         }
         else
         {
