@@ -8,7 +8,6 @@
 #include <cmath>
 #include <algorithm>
 #include "profiles.h"
-#include "simulationentity.h"
 using namespace std;
 
 vector<PatientProfile> patients;
