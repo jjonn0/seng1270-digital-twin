@@ -3,6 +3,28 @@
 #include <string>
 #include <ctime>
 #include <format>
+#include <array>
+#include <vector>
+
+const size_t MAXIMUM_STORED_SHIFTS{10};
+
+/// @brief The unit the staff member is assigned to. Use GENERAL for a non-specific unit.
+enum Unit
+{
+    GENERAL,
+    ER,
+    ICU,
+    CARDIAC
+};
+
+/// @brief The time designation of a shift. Uses two time_t data members for a start and end time.
+struct TimeBlock
+{
+    time_t time_block_start;
+    time_t time_block_end;
+
+    size_t getTotalTime() const { return time_block_end - time_block_start; }
+};
 
 class Profile
 {
@@ -81,20 +103,23 @@ class PatientProfile final : public Profile
 class StaffProfile final : public Profile
 {
     private:
-    std::string m_first_name;           // The first name of the person on profile.
-    std::string m_last_name;            // The last name of the person on profile.
-    size_t m_age;                       // The age of the person on profile.
-    time_t m_creation_date;             // The data the profile was created. This is assigned automatically, unless specified at the end of the constructor.
-    size_t m_profile_number;            // The internal profile number. This is not created automatically, and must be manually assigned during construction.
-    std::string m_occupation;           // The occupation the staff member belongs to.
-    size_t m_wage;                      // The wage the staff member recieves. Uses a non-decimal number to avoid floating-point precision errors. Example: 2005 will be treated as $20.05/hr.
+    std::string m_first_name;                                // The first name of the person on profile.
+    std::string m_last_name;                                 // The last name of the person on profile.
+    size_t m_age;                                            // The age of the person on profile.
+    time_t m_creation_date;                                  // The data the profile was created. This is assigned automatically, unless specified at the end of the constructor.
+    size_t m_profile_number;                                 // The internal profile number. This is not created automatically, and must be manually assigned during construction.
+    std::string m_occupation;                                // The occupation the staff member belongs to.
+    size_t m_wage;                                           // The wage the staff member recieves. Uses a non-decimal number to avoid floating-point precision errors. Example: 2005 will be treated as $20.05/hr.
+    std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> m_shifts;   // The shifts the staff member is working.
+    Unit m_assigned_unit;                                    // The unit the staff member is assigned to. GENERAL for non-specific unit.
+    std::vector<std::string> m_assigned_rooms;
 
     public:
-    StaffProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", size_t age = 0, std::string occupation = "<unknown>", size_t wage = 0) :
-    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name {last_name}, m_age{age}, m_occupation{occupation}, m_wage{wage}, m_creation_date{time_t(nullptr)} {}
+    StaffProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", size_t age = 0, std::string occupation = "<unknown>", size_t wage = 0, std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts = {}, Unit asssigned_unit = GENERAL, std::vector<std::string> assigned_rooms = {}) :
+    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name {last_name}, m_age{age}, m_occupation{occupation}, m_wage{wage}, m_shifts{shifts}, m_assigned_unit{asssigned_unit}, m_assigned_rooms{assigned_rooms}, m_creation_date{time_t(nullptr)} {}
 
-    StaffProfile(size_t profile_number, std::string first_name, std::string last_name, size_t age, std::string occupation, size_t wage, time_t creation_date) :
-    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name {last_name}, m_age{age}, m_occupation{occupation}, m_wage{wage}, m_creation_date{creation_date} {}
+    StaffProfile(size_t profile_number, std::string first_name, std::string last_name, size_t age, std::string occupation, size_t wage, time_t creation_date, std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts, Unit asssigned_unit, std::vector<std::string> assigned_rooms) :
+    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name {last_name}, m_age{age}, m_occupation{occupation}, m_wage{wage}, m_shifts{shifts}, m_assigned_unit{asssigned_unit}, m_assigned_rooms{assigned_rooms}, m_creation_date{creation_date} {}
 
     std::string getFirstName() const override { return m_first_name; }
     void setFirstName(std::string first_name) override { m_first_name = first_name; }
@@ -114,6 +139,15 @@ class StaffProfile final : public Profile
 
     size_t getWage() const { return m_wage; }
     void setWage(size_t wage) { m_wage = wage; }
+
+    std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> getShifts() const { return m_shifts; }
+    void setShifts(std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts) { m_shifts = shifts; }
+
+    Unit getAssignedUnit() const { return m_assigned_unit; }
+    void setAssignedUnit(Unit assigned_unit) { m_assigned_unit = assigned_unit; }
+
+    std::vector<std::string> getAssignedRooms() const { return m_assigned_rooms; }
+    void setAssignedRooms(std::vector<std::string> assigned_rooms) { m_assigned_rooms = assigned_rooms; }
 
     std::string toString() const override { return std::format("{} {} {} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_age, m_creation_date, m_occupation, m_wage); }
     std::string toFormattedString() const override
