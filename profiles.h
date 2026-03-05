@@ -6,26 +6,19 @@
 
 class Profile
 {
-    protected:
-    std::string m_first_name;           // The first name of the person on profile.
-    std::string m_last_name;            // The last name of the person on profile.
-    size_t m_age;                       // The age of the person on profile.
-    time_t m_creation_date;             // The data the profile was created. This is assigned automatically, unless specified at the end of the constructor.
-    size_t m_profile_number;            // The internal profile number. This is not created automatically, and must be manually assigned during construction.
-
     public:
-    std::string getFirstName() const { return m_first_name; }
-    void setFirstName(std::string first_name) { m_first_name = first_name; }
+    virtual std::string getFirstName() const = 0;
+    virtual void setFirstName(std::string first_name) = 0;
 
-    std::string getLastName() const { return m_last_name; }
-    void setLastName(std::string last_name) { m_last_name = last_name; }
+    virtual std::string getLastName() const = 0;
+    virtual void setLastName(std::string last_name) = 0;
 
-    size_t getAge() const { return m_age; }
-    void setAge(size_t age) { m_age = age; }
+    virtual size_t getAge() const = 0;
+    virtual void setAge(size_t age) = 0;
 
-    time_t getCreationDate() const { return m_creation_date; }
+    virtual time_t getCreationDate() const = 0;
 
-    size_t getProfileNumber() const { return m_profile_number; }
+    virtual size_t getProfileNumber() const = 0;
 
     virtual std::string toString() const = 0;
     virtual std::string toFormattedString() const = 0;
@@ -51,6 +44,19 @@ class PatientProfile final : public Profile
     // Creating a patient profile from a pre-existing patient profile
     PatientProfile(size_t profile_number, std::string first_name, std::string last_name, size_t age, std::string reason_of_admission, time_t time_of_admission, time_t expected_time_of_stay, time_t creation_date) : 
     m_profile_number{profile_number}, m_first_name{first_name}, m_last_name{last_name}, m_age{age}, m_reason_of_admission{reason_of_admission}, m_time_of_admission{time_of_admission}, m_expected_time_of_stay{expected_time_of_stay}, m_creation_date{creation_date} {}
+
+    std::string getFirstName() const override { return m_first_name; }
+    void setFirstName(std::string first_name) override { m_first_name = first_name; }
+
+    std::string getLastName() const override { return m_last_name; }
+    void setLastName(std::string last_name) override { m_last_name = last_name; }
+
+    size_t getAge() const override { return m_age; }
+    void setAge(size_t age) override { m_age = age; }
+
+    time_t getCreationDate() const override { return m_creation_date; }
+
+    size_t getProfileNumber() const override { return m_profile_number; }
 
     std::string getReasonOfAdmission() const { return m_reason_of_admission; }
     void setReasonOfAdmission(std::string reason_of_admission) { m_reason_of_admission = reason_of_admission; }
@@ -89,6 +95,19 @@ class StaffProfile final : public Profile
 
     StaffProfile(size_t profile_number, std::string first_name, std::string last_name, size_t age, std::string occupation, size_t wage, time_t creation_date) :
     m_profile_number{profile_number}, m_first_name{first_name}, m_last_name {last_name}, m_age{age}, m_occupation{occupation}, m_wage{wage}, m_creation_date{creation_date} {}
+
+    std::string getFirstName() const override { return m_first_name; }
+    void setFirstName(std::string first_name) override { m_first_name = first_name; }
+
+    std::string getLastName() const override { return m_last_name; }
+    void setLastName(std::string last_name) override { m_last_name = last_name; }
+
+    size_t getAge() const override { return m_age; }
+    void setAge(size_t age) override { m_age = age; }
+
+    time_t getCreationDate() const override { return m_creation_date; }
+
+    size_t getProfileNumber() const override { return m_profile_number; }
 
     std::string getOccupation() const { return m_occupation; }
     void setOccupation(std::string occupation) { m_occupation = occupation; }
