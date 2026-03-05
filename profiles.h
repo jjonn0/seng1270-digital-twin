@@ -14,7 +14,15 @@ enum Unit
     GENERAL,
     ER,
     ICU,
-    CARDIAC
+    CARDIAC,
+    NEURO,
+    POST_OP,
+    GERIATRIC,
+    TRAUMA,
+    NEPHRO,
+    PSYCH,
+    ONCOLOGY,
+    PALLIATIVE
 };
 
 /// @brief The time designation of a shift. Uses two time_t data members for a start and end time.
