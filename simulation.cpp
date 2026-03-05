@@ -8,7 +8,6 @@
 #include <cmath>
 #include <algorithm>
 #include "profiles.h"
-#include "simulationentity.h"
 using namespace std;
 
 vector<PatientProfile> patients;
@@ -152,67 +151,7 @@ void displayModifyProfilesMenu()
  */
 void displayProfileModifyTable(auto& profiles)
 {
-    const size_t entries_per_page{10};
-    string input{""};
-    size_t current_page{0};
-
-    while(true)
-    {
-        size_t page_count{size_t(floor(profiles.size() / entries_per_page))};
-        size_t entry_count_to_back{profiles.size() - (current_page * entries_per_page)};
-        size_t entries_on_page{(entries_per_page < entry_count_to_back) ? entries_per_page : entry_count_to_back}; // Find out how many entities are on the current page.
-        
-        cout << format("\n{:<6s} | {:<20s} | {:<20s} | {:<20s}\n", "Index", "Profile Number", "Last Name", "First Name");
-        
-        for(size_t index{current_page * entries_per_page}; index < entries_on_page + current_page * entries_per_page; index++)
-        {
-            cout << format("{:<6d} | {:<20d} | {:<20s} | {:<20s}\n", index, profiles[index].getProfileNumber(), profiles[index].getLastName(), profiles[index].getFirstName());
-        }
-        cout << format("Page ({}/{})\n", current_page, page_count);
-        cout << format("{}\n{}\n{}\n{}\n{}\n\n>", "p# - Switch to Page", "# - Index to View/Edit Profile", "a - Add New Profile", "r# - Remove Profile", "CTRL+Z - Go Back");
-        
-        if(cin >> input)
-        {
-            regex page_pattern(R"(^(p|P)\d+$)"); // Matches with any string starting with a p or P and ending with any number.
-            regex index_pattern(R"(^\d+$)");
-            regex removal_pattern(R"(^(r|R)\d+$)");
-            regex letter_stripper(R"(([a-z]|[A-Z]))"); // Matches with any letter character
-            try
-            {
-                if(regex_match(input, page_pattern))
-                {
-                    input = regex_replace(input, letter_stripper, "");
-                    current_page = min(stoi(input), int(page_count));
-                    continue;
-                }
-                else if(regex_match(input, index_pattern))
-                {
-                    int index_numerical{stoi(input)};
-                    if(index_numerical >= profiles.size()) { displayErrorMessage("\nThe index entered exceeded the maximum value. Enter anything to continue.\n"); }
-                    displayModifyProfileMenu(profiles[index_numerical]);
-                }
-                else if(input == "a")
-                {
-                    auto new_profile{createNewProfile(profiles)};
-                    profiles.push_back(new_profile);
-                    displayModifyProfileMenu(profiles[profiles.size() - 1]);
-                }
-                else if(regex_match(input, removal_pattern))
-                {
-                    input = regex_replace(input, letter_stripper, "");
-                    int index_numerical{stoi(input)};
-                    if(index_numerical >= profiles.size()) { displayErrorMessage("\nThe index entered exceeded the maximum value. Enter anything to continue.\n"); }
-                    for(index_numerical; index_numerical < profiles.size() - 1; index_numerical++) { profiles[index_numerical] = profiles[index_numerical + 1]; }
-                    profiles.pop_back();
-                }
-                else { throw 0; }
-            }
-            catch(...) { displayErrorMessage("\nAn invalid input was given. Enter anything to continue.\n"); }
-        }
-        else { break; }
-    }
-        
-    cin.clear();
+    
 }
 
 /**
@@ -384,47 +323,5 @@ void displayStatusReportMenu(time_t old_timestamp, time_t new_timestamp)
 
 string generateStatusReport(time_t old_timestamp, time_t new_timestamp, auto profiles)
 {
-    string output{""};
-    bool is_empty{true};
-
-    // Takes in two points in time and the time the event is to occur, and returns true or false. Requires disambiguation.
-    auto hasOccured([](time_t old_timestamp, time_t new_timestamp, time_t occurence_time){
-        bool after_old_timestamp{false}, after_new_timestamp{false};
-        after_old_timestamp = (occurence_time > old_timestamp ? true : false);
-        after_new_timestamp = (occurence_time > new_timestamp ? true : false);
-        if(after_old_timestamp != after_new_timestamp) { return true; }
-        return false;
-    });
-
-    vector<PatientProfile> patient_reference_vector{};
-    vector<StaffProfile> staff_reference_vector{};
-
-    string patient_vector_id{typeid(patient_reference_vector).name()};
-    string staff_vector_id{typeid(staff_reference_vector).name()};
-    string profiles_id{typeid(profiles).name()};
-
-    // Patient status report
-    if(profiles_id == patient_vector_id)
-    {
-        output += "PATIENT STATUS REPORT\n";
-        for(auto e : profiles)
-        {
-            time_t discharge_timestamp{e.getExpectedTimeOfStay()};
-
-            if(hasOccured(old_timestamp, new_timestamp, discharge_timestamp))
-            {
-                if(old_timestamp < new_timestamp) { output += format("{:<20d} | {:<20s} | {:<20s} | Discharged.\n", e.getProfileNumber(), e.getLastName(), e.getFirstName()); }
-                if(old_timestamp > new_timestamp) { output += format("{:<20d} | {:<20s} | {:<20s} | Un-discharged.\n", e.getProfileNumber(), e.getLastName(), e.getFirstName()); }
-                is_empty = false;
-            }
-        }
-    }
-
-    // Staff status report
-    if(profiles_id == staff_vector_id)
-    {
-        
-    }
-
-    return (is_empty ? "Report empty." : output);
+    return "";
 }
