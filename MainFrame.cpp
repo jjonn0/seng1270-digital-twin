@@ -1,28 +1,41 @@
 #include "MainFrame.h"
 #include<wx/wx.h>
 
-MainFrame::MainFrame(const wxString& title): wxFrame(nullptr, wxID_ANY, title) {
 
+
+
+
+MainFrame::MainFrame(const wxString& title): wxFrame(nullptr, wxID_ANY, title) {
 	wxPanel* panel = new wxPanel(this);
 
-	wxButton* button = new wxButton(panel, wxID_ANY, "Button", wxPoint(100, 50), wxSize(100, 35)) ;
+	wxButton* button1 = new wxButton(panel, wxID_ANY, "Button 1", wxPoint(300, 275), wxSize(200, 50));
+	wxButton* button2 = new wxButton(panel, wxID_ANY, "Button 2", wxPoint(300, 350), wxSize(200, 50));
 
-	wxCheckBox* checkBox = new wxCheckBox(panel, wxID_ANY, "CheckBox", wxPoint(550, 55));
+	this->Bind(wxEVT_CLOSE_WINDOW, &MainFrame::OnClose, this);
+	this->Bind(wxEVT_BUTTON, &MainFrame::OnAnyButtonClicked, this);
+	button1->Bind(wxEVT_BUTTON, &MainFrame::OnButton1Clicked, this);
+	button2->Bind(wxEVT_BUTTON, &MainFrame::OnButton2Clicked, this);
 
-	wxStaticText* staticText = new wxStaticText(panel, wxID_ANY, "Static Text", wxPoint(105, 150));
 
-	wxTextCtrl* textCtrl = new wxTextCtrl(panel, wxID_ANY, "Editable Text", wxPoint(100, 200), wxSize(200, -1));
 
-	wxSlider* slider = new wxSlider(panel, wxID_ANY, 25, 0, 100, wxPoint(100, 250), wxSize(200, -1));
+	CreateStatusBar();
+}
 
-	wxGauge* gauge = new wxGauge(panel, wxID_ANY, 100, wxPoint(500, 255), wxSize(200, -1));
-	gauge->SetValue(50);
+void MainFrame::OnClose(wxCloseEvent& evt) {
+	wxLogMessage("Frame Closed");
+	evt.Skip();
+}
 
-	wxArrayString choices{"Item A", "Item B", "Item C"};
-	wxChoice* choice = new wxChoice(panel, wxID_ANY, wxPoint(100, 375), wxSize(200, -1), choices);
-	choice->Select(0);
+void MainFrame::OnAnyButtonClicked(wxCommandEvent& evt) {
+	wxLogMessage("Button Clicked");
+}
 
-	//wxSpinCtrl* spinCtrl = new wxSpinCtrl(panel, wxID_ANY, "", wxPoint(550, 375), wxSize(100, -1));
+void MainFrame::OnButton1Clicked(wxCommandEvent& evt) {
+	wxLogStatus("Button 1 Clicked");
+	evt.Skip();
+}
+void MainFrame::OnButton2Clicked(wxCommandEvent& evt) {
+	wxLogStatus("Button 2 Clicked");
+	evt.Skip();
 
-	wxRadioBox* radioBox = new wxRadioBox(panel, wxID_ANY, "RadioBox", wxPoint(485, 475), wxDefaultSize, choices);
 }
