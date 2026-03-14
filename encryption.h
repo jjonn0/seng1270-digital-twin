@@ -1,62 +1,85 @@
 #pragma once
 #include <string>
 #include <array>
+#include <vector>
 #include <iostream>
+#include <bitset>
 #include <cmath>
 
-/**
- * @brief           Swaps a plaintext string with a binary string and vice versa.
- * @param data      A string that is either plaintext or binary.
- * @param invert    If false, takes a plaintext string and returns a binary string. Of tru, takes a binary string and returns a plaintext string.
- */
-std::string binarySwitch(std::string data, bool invert);
-/** @warning Not implemented */
-std::string generateKey(std::string key_data);
+void displayChars(vector<size_t> numbers);
 /** @warning Not implemented */
 std::string encrypt(std::string key, std::string data);
 
-std::string binarySwitch(std::string data, bool invert = false)
+void displayChars(vector<size_t> numbers)
 {
-    const size_t CHAR_SIZE{8};
-    std::string return_string{""};
-    // Binary-to-string conversion
-    if(invert)
+    for(size_t n : numbers)
     {
-        size_t char_value{0};
-        for(int char_index{0}; char_index <= data.length(); char_index++)
-        {
-            int bit_index{char_index % int(CHAR_SIZE)};
-            if(bit_index == 0 && char_index != 0)
-            {
-                return_string += char(char_value);
-                char_value = 0;
-            }
-            int bit_state{data[char_index] == '0' ? 0 : 1};
-            char_value += bit_state * pow(2, CHAR_SIZE - bit_index - 1);
-        }
+        cout << char(n);
     }
-    // String-to-binary conversion
-    else
-    {
-        for(char c : data)
-        {
-            for(int bit_index{CHAR_SIZE - 1}; bit_index >= 0; bit_index--)
-            {
-                int bit{(c & (1 << bit_index)) ? '1' : '0'};
-                return_string += bit;
-            }
-        }
-    }
+}
+
+std::string encrypt(size_t key, std::string data)
+{
     
-    return return_string;
-}
-
-std::string generateKey(std::string key_data)
-{
     return "";
 }
 
-std::string encrypt(std::string key, std::string data)
+class ByteBlock
 {
-    return "";
-}
+    private:
+    static const size_t COL_COUNT{4};
+    static const size_t ROW_COUNT{4};
+    static const size_t BYTE_SIZE{8};
+    static const size_t BLOCK_SIZE{COL_COUNT * ROW_COUNT};
+    array<array<bitset<BYTE_SIZE>, ROW_COUNT>, COL_COUNT> m_byte_block;
+
+    public:
+    ByteBlock(const array<bitset<BYTE_SIZE>, BLOCK_SIZE>& values) 
+    {
+        for(size_t index{0}; index < values.size(); index++)
+        {
+            size_t row_index{size_t(floor(index / COL_COUNT))};
+            m_byte_block[row_index][index - row_index * COL_COUNT] = values[index];
+        }
+    }
+
+    void displayBlock()
+    {
+        for(array<bitset<BYTE_SIZE>, ROW_COUNT> row : m_byte_block)
+        {
+            for(bitset<BYTE_SIZE> bit_block : row)
+            {
+                std::cout << bit_block << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    /**
+     * @brief   Shifts the rows up by the given amount.
+     */
+    void shiftRows(size_t shift_amount)
+    {
+        array<array<bitset<BYTE_SIZE>, ROW_COUNT>, COL_COUNT> pre_shift_block{m_byte_block};
+
+        for(size_t row_index{0}; row_index < ROW_COUNT; row_index++)
+        {
+            m_byte_block[row_index] = pre_shift_block[((row_index + shift_amount) % ROW_COUNT)];
+        }
+    }
+    /**
+     * @brief   Shifts the columns left by the given amount.
+     */
+    void shiftCols(size_t shift_amount)
+    {
+        array<array<bitset<BYTE_SIZE>, ROW_COUNT>, COL_COUNT> pre_shift_block{m_byte_block};
+
+        for(size_t row_index{0}; row_index < ROW_COUNT; row_index++)
+        {
+            for(size_t col_index{0}; col_index < COL_COUNT; col_index++)
+            {
+                m_byte_block[row_index][col_index] = pre_shift_block[row_index][((col_index + shift_amount) % COL_COUNT)];
+            }
+        }
+    }
+};
