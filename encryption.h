@@ -6,15 +6,21 @@
 #include <bitset>
 #include <cmath>
 
-void displayChars(vector<size_t> numbers);
+static const size_t COL_COUNT{4}; // Number of cols contained in the block
+static const size_t ROW_COUNT{4}; // Number of rows contained in the block
+static const size_t BYTE_SIZE{8}; // Number of bits in a byte
+static const size_t BLOCK_SIZE{COL_COUNT * ROW_COUNT}; // Number of cells in a block
+static const size_t KEY_SIZE{BLOCK_SIZE * BYTE_SIZE}; // Key size in bits
+
+void displayChars(std::vector<size_t> numbers);
 /** @warning Not implemented */
 std::string encrypt(std::string key, std::string data);
 
-void displayChars(vector<size_t> numbers)
+void displayChars(std::vector<size_t> numbers)
 {
     for(size_t n : numbers)
     {
-        cout << char(n);
+        std::cout << char(n);
     }
 }
 
@@ -27,14 +33,11 @@ std::string encrypt(size_t key, std::string data)
 class ByteBlock
 {
     private:
-    static const size_t COL_COUNT{4};
-    static const size_t ROW_COUNT{4};
-    static const size_t BYTE_SIZE{8};
-    static const size_t BLOCK_SIZE{COL_COUNT * ROW_COUNT};
-    array<array<bitset<BYTE_SIZE>, ROW_COUNT>, COL_COUNT> m_byte_block;
+    
+    std::array<std::array<std::bitset<BYTE_SIZE>, ROW_COUNT>, COL_COUNT> m_byte_block;
 
     public:
-    ByteBlock(const array<bitset<BYTE_SIZE>, BLOCK_SIZE>& values) 
+    ByteBlock(const std::array<std::bitset<BYTE_SIZE>, BLOCK_SIZE>& values) 
     {
         for(size_t index{0}; index < values.size(); index++)
         {
@@ -45,9 +48,9 @@ class ByteBlock
 
     void displayBlock()
     {
-        for(array<bitset<BYTE_SIZE>, ROW_COUNT> row : m_byte_block)
+        for(std::array<std::bitset<BYTE_SIZE>, ROW_COUNT> row : m_byte_block)
         {
-            for(bitset<BYTE_SIZE> bit_block : row)
+            for(std::bitset<BYTE_SIZE> bit_block : row)
             {
                 std::cout << bit_block << " ";
             }
@@ -60,7 +63,7 @@ class ByteBlock
      */
     void shiftRows(size_t shift_amount)
     {
-        array<array<bitset<BYTE_SIZE>, ROW_COUNT>, COL_COUNT> pre_shift_block{m_byte_block};
+        std::array<std::array<std::bitset<BYTE_SIZE>, ROW_COUNT>, COL_COUNT> pre_shift_block{m_byte_block};
 
         for(size_t row_index{0}; row_index < ROW_COUNT; row_index++)
         {
@@ -72,7 +75,7 @@ class ByteBlock
      */
     void shiftCols(size_t shift_amount)
     {
-        array<array<bitset<BYTE_SIZE>, ROW_COUNT>, COL_COUNT> pre_shift_block{m_byte_block};
+        std::array<std::array<std::bitset<BYTE_SIZE>, ROW_COUNT>, COL_COUNT> pre_shift_block{m_byte_block};
 
         for(size_t row_index{0}; row_index < ROW_COUNT; row_index++)
         {
@@ -82,4 +85,28 @@ class ByteBlock
             }
         }
     }
+};
+
+class EncryptionKey
+{
+    private:
+    std::bitset<KEY_SIZE> m_key;
+
+    public:
+    EncryptionKey(std::string data)
+    {
+        size_t byte_index{0};
+        for(const char c : data)
+        {
+            std::bitset<BYTE_SIZE> char_bits{unsigned long long int(c)};
+            for(size_t key_bit_index{0}; key_bit_index < KEY_SIZE; key_bit_index++)
+            {
+                
+            }
+        }
+    }
+
+    std::bitset<KEY_SIZE> getKey() { return m_key; }
+
+    std::string toString() { return m_key.to_string(); }
 };
