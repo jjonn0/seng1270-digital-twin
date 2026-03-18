@@ -8,9 +8,6 @@
 
 const size_t MAXIMUM_STORED_SHIFTS{10};
 
-std::vector<PatientProfile> patients;
-std::vector<StaffProfile> staff;
-
 /// @brief The unit the staff member is assigned to. Use GENERAL for a non-specific unit.
 enum Unit
 {
