@@ -38,7 +38,9 @@ PatientStatus patientAdmissionStatus(PatientProfile patient_profile, time_t prev
 /// @param time_unit        The unit of time.
 /// @return                 An estimated cost multiplied by 100. (To avoid floating-point precision errors.)
 /// @note                   Rounds up for some calculations.
-size_t returnCostEstimation(size_t cost_per_time, time_t elapsed_time, TimeUnit time_unit);
+size_t getCostEstimation(size_t cost_per_time, time_t elapsed_time, TimeUnit time_unit);
+
+array<TimeBlock, MAXIMUM_STORED_SHIFTS> getUpcomingShifts(StaffProfile staff_profile, time_t current_time);
 
 //*****************************************************************************************//
 //*****************************************************************************************//
@@ -68,8 +70,32 @@ PatientStatus patientAdmissionStatus(PatientProfile patient_profile, time_t prev
     return NONE;
 }
 
-size_t returnCostEstimation(size_t cost_per_time, time_t elapsed_time, TimeUnit time_unit)
+size_t getCostEstimation(size_t cost_per_time, time_t elapsed_time, TimeUnit time_unit)
 {
     size_t elapsed_time_units{size_t(ceil(elapsed_time / time_unit))};
     return cost_per_time * elapsed_time_units;
+}
+
+array<TimeBlock, MAXIMUM_STORED_SHIFTS> getUpcomingShifts(StaffProfile staff_profile, time_t current_time)
+{
+    array<TimeBlock, MAXIMUM_STORED_SHIFTS> upcoming_shifts{};
+    array<TimeBlock, MAXIMUM_STORED_SHIFTS> staff_shifts{staff_profile.getShifts()};
+
+    upcoming_shifts.fill(TimeBlock{0, 0});
+    for(TimeBlock shift : staff_shifts)
+    {
+        if(shift.time_block_start > current_time)
+        {
+            for(TimeBlock upcoming_shift : upcoming_shifts)
+            {
+                if(upcoming_shift.getTotalTime() == 0)
+                {
+                    upcoming_shift = shift;
+                    break;
+                }
+            }
+        }
+    }
+
+    return upcoming_shifts;
 }
