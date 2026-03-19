@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>VitalVitals</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow {
+    background-color: #ecf0f1;  /* light gray */
+}
+
+/* Title Label */
+QLabel {
+    font-family: &quot;Helvetica Neue&quot;, Arial, sans-serif;
+    font-size: 32px;
+    font-weight: bold;
+    color: #2c3e50;  /* dark blue/gray */
+    qproperty-alignment: 'AlignHCenter | AlignVCenter';
+}
+
+/* Buttons */
+QPushButton {
+    background-color: #3498db; /* blue */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 10px;
+    min-width: 150px;
+}
+
+QPushButton:hover {
+    background-color: #2980b9;  /* darker blue on hover */
+}
+
+QPushButton:pressed {
+    background-color: #1c5980;  /* even darker on click */</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="styleSheet">
+         <string notr="true">QLabel {
+    font-family: &quot;Helvetica Neue&quot;, Arial, sans-serif;
+    font-size: 32px;           /* Big and clear */
+    font-weight: bold;          /* Makes it bold */
+    color: #2c3e50;             /* Dark blue/gray color */
+    qproperty-alignment: 'AlignHCenter | AlignVCenter';  /* Centers text */
+}</string>
+        </property>
+        <property name="text">
+         <string>VitalVitals</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="inPatientsButton">
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 10px;
+}
+QPushButton:hover {
+    background-color: #2980b9;
+}</string>
+        </property>
+        <property name="text">
+         <string>In-Patients</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="staffButton">
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 10px;
+}
+QPushButton:hover {
+    background-color: #2980b9;
+}</string>
+        </property>
+        <property name="text">
+         <string>Staff Resources</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>33</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
