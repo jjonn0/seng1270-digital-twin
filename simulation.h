@@ -77,20 +77,15 @@ std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> getUpcomingShifts(StaffProfile staf
 {
     std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> upcoming_shifts{};
     std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> staff_shifts{staff_profile.getShifts()};
+    size_t upcoming_count{0};
 
     upcoming_shifts.fill(TimeBlock{0, 0});
     for(TimeBlock shift : staff_shifts)
     {
         if(shift.time_block_start > current_time)
         {
-            for(TimeBlock upcoming_shift : upcoming_shifts)
-            {
-                if(upcoming_shift.getTotalTime() == 0)
-                {
-                    upcoming_shift = shift;
-                    break;
-                }
-            }
+            upcoming_shifts[upcoming_count] = shift;
+            upcoming_count++;
         }
     }
 

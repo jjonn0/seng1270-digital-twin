@@ -28,11 +28,16 @@ enum Unit
 /// @brief The time designation of a shift. Uses two time_t data members for a start and end time.
 struct TimeBlock
 {
-    time_t time_block_start;
-    time_t time_block_end;
+    time_t time_block_start{0};
+    time_t time_block_end{0};
 
     size_t getTotalTime() const { return time_block_end - time_block_start; }
-    std::string toString() const { return ""; }
+    std::string toString() const
+    {
+        std::string time_start{ctime(&time_block_start)};
+        std::string time_end{ctime(&time_block_end)};
+        return std::format("{}{}", time_start, time_end);
+    }
 };
 
 class Profile
