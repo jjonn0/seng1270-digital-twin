@@ -2,9 +2,6 @@
 #include <vector>
 #include <cmath>
 #include "profiles.h"
-using namespace std;
-
-
 
 enum PatientStatus
 {
@@ -40,7 +37,7 @@ PatientStatus patientAdmissionStatus(PatientProfile patient_profile, time_t prev
 /// @note                   Rounds up for some calculations.
 size_t getCostEstimation(size_t cost_per_time, time_t elapsed_time, TimeUnit time_unit);
 
-array<TimeBlock, MAXIMUM_STORED_SHIFTS> getUpcomingShifts(StaffProfile staff_profile, time_t current_time);
+std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> getUpcomingShifts(StaffProfile staff_profile, time_t current_time);
 
 //*****************************************************************************************//
 //*****************************************************************************************//
@@ -76,10 +73,10 @@ size_t getCostEstimation(size_t cost_per_time, time_t elapsed_time, TimeUnit tim
     return cost_per_time * elapsed_time_units;
 }
 
-array<TimeBlock, MAXIMUM_STORED_SHIFTS> getUpcomingShifts(StaffProfile staff_profile, time_t current_time)
+std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> getUpcomingShifts(StaffProfile staff_profile, time_t current_time)
 {
-    array<TimeBlock, MAXIMUM_STORED_SHIFTS> upcoming_shifts{};
-    array<TimeBlock, MAXIMUM_STORED_SHIFTS> staff_shifts{staff_profile.getShifts()};
+    std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> upcoming_shifts{};
+    std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> staff_shifts{staff_profile.getShifts()};
 
     upcoming_shifts.fill(TimeBlock{0, 0});
     for(TimeBlock shift : staff_shifts)
