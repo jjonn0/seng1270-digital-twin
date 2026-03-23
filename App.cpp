@@ -5,10 +5,10 @@
 
 wxIMPLEMENT_APP(App);
 
-bool App::OnInit() 
+bool App::OnInit()
 {
-	MainFrame* mainFrame = new MainFrame("Shauns GUI");
-	mainFrame->SetClientSize(800, 600);
+	MainFrame* mainFrame = new MainFrame("VitalVitals");
+	mainFrame->SetClientSize(1000, 600);
 	mainFrame->Center();
 	mainFrame->Show();
 	return true;
