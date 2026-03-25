@@ -1,95 +1,91 @@
-#include "MainFrame.h"
-#include "simulation.h"
-#include "profiles.h"
-#include "StatusPage.h"
-#include "ProfilePage.h"
+#pragma once
+#include<wx/wx.h>
+#include<vector>
 #include <wx/notebook.h>
 #include <wx/simplebook.h>
-#include<wx/wx.h>
-
-PatientProfile myPatient(101, "John", "Doe");
-wxString fullName = wxString::FromUTF8(myPatient.getFirstName() + " " + myPatient.getLastName());
+#include "simulation.h"
+#include "profiles.h"
 
 
-MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) {
-	//wxButton* bv1 = new wxButton(this, wxID_ANY, "A1", wxDefaultPosition, wxSize(300, 100));
-	//wxButton* bv2 = new wxButton(this, wxID_ANY, "B1", wxDefaultPosition, wxSize(300, 100));
-	wxBoxSizer* boxSizer = new wxBoxSizer(wxHORIZONTAL);
-	//boxSizer->AddStretchSpacer();
-
-	//boxSizer->Add(bv1);
-	//boxSizer->Add(bv2);
-	//boxSizer->AddStretchSpacer();
+class ProfilePage : public wxPanel
+{
+public:
 
 
+	ProfilePage(wxWindow* Parent) : wxPanel(Parent) {
+		InitComps();
+		Styles();
 
-	//SetSizerAndFit(boxSizer);
+	};
+	void InitComps() {
 
+		m_patSizer = new wxBoxSizer(wxVERTICAL);
+		m_profSizer = new wxBoxSizer(wxVERTICAL);
+		m_trSizer = new wxBoxSizer(wxHORIZONTAL);
 
+		m_notebook1 = new wxNotebook(this, wxID_ANY, wxPoint(200, 50), wxSize(400, 300));
 
-	wxSimplebook* pageContainer = new wxSimplebook(this, wxID_ANY, wxPoint(200, 50));
-	ProfilePage* page2 = new ProfilePage(pageContainer);
-	StatusPage* page3 = new StatusPage(pageContainer);
+		m_subPanel1 = new wxPanel(m_notebook1);
+		m_subPanel2 = new wxPanel(m_notebook1);
 
-	wxPanel* page1 = new wxPanel(pageContainer);
-	page1->SetBackgroundColour(*wxLIGHT_GREY);
-	wxStaticText* HomeT = new wxStaticText(page1, wxID_ANY, "Vitals Vitals", wxPoint(400, 75));
-	HomeT->SetFont(wxFont(22, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-	wxButton* Prof = new wxButton(page1, wxID_ANY, "Profiles", wxPoint(20, 50));
-	wxButton* Stat = new wxButton(page1, wxID_ANY, "Status", wxPoint(200, 200));
-	wxButton* Home1 = new wxButton(page2, wxID_ANY, "Home", wxPoint(200, 200));
-	wxButton* Home2 = new wxButton(page3, wxID_ANY, "Home", wxPoint(200, 200));
+		m_staffShifts = new wxStaticText(m_subPanel2, wxID_ANY, "Loading...");
+		m_patientLabel = new wxStaticText(m_subPanel1, wxID_ANY, "Loading...");
 
+		wxButton* homeBtn = new wxButton(m_subPanel1, wxID_ANY, "Home");
 
+		homeBtn->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { static_cast<wxSimplebook*>(this->GetParent())->SetSelection(0); });
 
-
-
-
-	//wxPanel* page2 = new wxPanel(pageContainer);
-	//page2->SetBackgroundColour(*wxLIGHT_GREY);
-	//wxStaticText* Patient = new wxStaticText(page2, wxID_ANY, "Modify Profiles", wxPoint(200, 400));
-
-	wxStaticText* StatT1 = new wxStaticText(page3, wxID_ANY, "Third Page", wxPoint(200, 400));
-
+		m_trSizer->Add(m_patientLabel, 0, wxALL, 10);
+		m_trSizer->AddStretchSpacer(2.1);
+		m_trSizer->Add(homeBtn, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
+		m_trSizer->AddStretchSpacer(4);
 
 
-	pageContainer->AddPage(page1, "Home");
-	pageContainer->AddPage(page2, "Profile Page");
-	pageContainer->AddPage(page3, "Status");
-	boxSizer->Add(pageContainer, 1, wxEXPAND);
-	Home1->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { pageContainer->SetSelection(0); });
-	Home2->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { pageContainer->SetSelection(0); });
-	Prof->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { pageContainer->SetSelection(1); });
-	Stat->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { pageContainer->SetSelection(2); });
+		m_patSizer->Add(m_trSizer, 0, wxEXPAND);
+		m_profSizer->Add(m_notebook1, 1, wxEXPAND | wxALL, 0);
+		m_subPanel1->SetSizer(m_patSizer);
+		this->SetSizer(m_profSizer);
+	}
+	void Styles() {
+		this->SetBackgroundColour(*wxLIGHT_GREY);
+		m_subPanel1->SetBackgroundColour(*wxLIGHT_GREY);
+		m_notebook1->AddPage(m_subPanel1, "Patient Profiles");
 
-	////pageContainer->AddPage(page3, "Third");
+		m_subPanel2->SetBackgroundColour(*wxLIGHT_GREY);
+		m_notebook1->AddPage(m_subPanel2, "Staff Profiles");
+
+	}
+	void UpdateDisplay(const std::vector<PatientProfile>& patient, const StaffProfile& staff, time_t currenttime) {
+		m_patientTot = "";
+		for (const auto& pat : patient){
+			wxString fullName = wxString::FromUTF8(pat.getFirstName() + " " + pat.getLastName());
+			wxString reason = wxString::FromUTF8(pat.getReasonOfAdmission());
+			m_patientTot += "Patient: " + fullName + "\nReason: " + reason + "\n";
+
+			//m_patientLabel->SetLabel(wxString::Format("Patient: %s\nReason: %s", fullName, reason));
+	}
+		m_patientLabel->SetLabel(m_patientTot);
+		m_staffShifts->SetLabel("Avtive Staff: " + wxString::FromUTF8(staff.getFirstName()));
+		this->Layout();
+	}
+	
+private:
+	wxBoxSizer* m_profSizer;
+	wxBoxSizer* m_patSizer;
+	wxBoxSizer* m_trSizer;
+
+	wxNotebook* m_notebook1;
+
+	wxPanel* m_subPanel1;
+	wxPanel* m_subPanel2;
 
 
-	////wxButton* button1 = new wxButton(page1, wxID_ANY, "a", wxPoint(300, 275), wxSize(200, 100));
-	////wxButton* button2 = new wxButton(page1, wxID_ANY, "Button2", wxPoint(300, 500), wxSize(200, 100));
-	////wxStaticText* staticText = new wxStaticText(page1, wxID_ANY, fullName, wxPoint(200, 400), wxSize(300, 100));
-	//page1->Bind(wxEVT_CHAR_HOOK, &MainFrame::OnKeyEvent, this);
+	wxString shiftDisplay = "Upcoming Shifts:\n";
+	wxString m_patientTot;
+
+	wxStaticText* m_staffShifts;
+	wxStaticText* m_patientLabel;
 
 
 
-	CreateStatusBar();
-
-}
-
-//void MainFrame::OnKeyEvent(wxKeyEvent& evt) {
-//	if (evt.GetKeyCode() == WXK_TAB) {
-//		wxWindow* window = (wxWindow*)evt.GetEventObject();
-//		window->Navigate();
-//	}
-//
-//	wxChar keyChar = evt.GetUnicodeKey();
-//	if (keyChar == WXK_NONE) {
-//		int keyCode = evt.GetKeyCode();
-//		wxLogStatus("Key Event %d", keyCode);
-//	}
-//	else {
-//
-//		wxLogStatus(keyChar);
-//
-//	}
-//}
+};
