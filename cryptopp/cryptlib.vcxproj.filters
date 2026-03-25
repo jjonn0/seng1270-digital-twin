@@ -539,6 +539,15 @@
     <ClCompile Include="zlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pem_read.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pem_common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pem_write.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Doxyfile">
@@ -1086,8 +1095,17 @@
     <ClInclude Include="chachapoly.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="pem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pem_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="cpuid64.asm">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="rdrand.asm">
       <Filter>Source Files</Filter>
     </CustomBuild>

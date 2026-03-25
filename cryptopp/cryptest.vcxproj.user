@@ -3,4 +3,10 @@
   <PropertyGroup>
     <LocalDebuggerCommandArguments>v</LocalDebuggerCommandArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerCommandArgumentsHistory>v|</LocalDebuggerCommandArgumentsHistory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArgumentsHistory>v|</LocalDebuggerCommandArgumentsHistory>
+  </PropertyGroup>
 </Project>

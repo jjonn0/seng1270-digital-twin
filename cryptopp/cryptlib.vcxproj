@@ -285,6 +285,9 @@
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="pem_common.cpp" />
+    <ClCompile Include="pem_read.cpp" />
+    <ClCompile Include="pem_write.cpp" />
     <ClCompile Include="pkcspad.cpp" />
     <ClCompile Include="poly1305.cpp" />
     <ClCompile Include="polynomi.cpp" />
@@ -368,6 +371,11 @@
     <None Include="Readme.txt" />
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Condition="'$(Platform)'=='x64' AND ('$(Configuration)'=='Debug' Or '$(Configuration)'=='Release')" Include="cpuid64.asm">
+      <Message>Building and assembling cpuid64.asm</Message>
+      <Command>ml64.exe /c /nologo /D_M_X64 /W3 /Zi /Fo"$(IntDir)cpuid64.obj" "%(FullPath)"</Command>
+      <Outputs>$(IntDir)cpuid64.obj;%(Outputs)</Outputs>
+    </CustomBuild>
     <CustomBuild Condition="'$(Platform)'=='Win32'" Include="rdrand.asm">
       <Message>Building and assembling rdrand.asm</Message>
       <Command>ml.exe /c /nologo /D_M_X86 /W3 /Cx /Zi /safeseh /Fo"$(IntDir)rdrand-x86.obj" "%(FullPath)"</Command>
@@ -512,6 +520,8 @@
     <ClInclude Include="padlkrng.h" />
     <ClInclude Include="panama.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="pem.h" />
+    <ClInclude Include="pem_common.h" />
     <ClInclude Include="pkcspad.h" />
     <ClInclude Include="poly1305.h" />
     <ClInclude Include="polynomi.h" />

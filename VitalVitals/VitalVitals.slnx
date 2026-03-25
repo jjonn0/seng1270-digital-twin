@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="VitalVitals.vcxproj" Id="17e27529-fa53-4d19-88bc-ef9f08737455" />
+</Solution>
