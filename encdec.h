@@ -23,7 +23,7 @@ constexpr size_t KEY_LENGTH{CryptoPP::AES::DEFAULT_KEYLENGTH};
 // Set to true to enable debug mode. Prints results into terminal.
 constexpr bool DEBUG_MODE{true};
 
-std::bitset<BYTE_SIZE* KEY_LENGTH> generateBytes(const std::string& data)
+std::bitset<BYTE_SIZE * KEY_LENGTH> generateBytes(const std::string& data)
 {
 	const size_t total_bits{BYTE_SIZE * KEY_LENGTH};
 	std::string remaining_string{data};
@@ -62,4 +62,39 @@ std::bitset<BYTE_SIZE* KEY_LENGTH> generateBytes(const std::string& data)
 	if (DEBUG_MODE) std::cout << std::format("Resulting bits: {}", bits.to_string()) << std::endl;
 
 	return bits;
+}
+
+std::string bitsToString(const std::bitset<BYTE_SIZE * KEY_LENGTH> bits)
+{
+	std::string string_out{""};
+
+	for(size_t byte_index{0}; byte_index < KEY_LENGTH; byte_index++)
+	{
+		size_t bit_index{0};
+		int char_value{0};
+		do
+		{
+			char_value += bits[byte_index * BYTE_SIZE + bit_index] * pow(2, bit_index);
+			bit_index++;
+		} while(bit_index % BYTE_SIZE != 0);
+		string_out += char(char_value);
+	}
+
+	return string_out;
+}
+
+std::string encrypt(std::string password, std::string data)
+{
+	// Truncate password
+	std::bitset<BYTE_SIZE* KEY_LENGTH> password_bits{generateBytes(password)};
+	std::string key_string{bitsToString(password_bits)};
+
+	CryptoPP::byte key_bytes[KEY_LENGTH];
+	memcpy(key_bytes, key_string.c_str(), 16); // When password is 16+ characters long, undefined behaviour occurs
+
+	std::cout << key_bytes;
+
+	CryptoPP::SecByteBlock key(key_bytes, KEY_LENGTH);
+
+	return "";
 }
