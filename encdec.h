@@ -24,6 +24,7 @@
 #include "files.h"
 
 constexpr size_t BYTE_SIZE{8};
+constexpr size_t HEXADECIMAL{16};
 constexpr size_t KEY_LENGTH{CryptoPP::AES::DEFAULT_KEYLENGTH};
 
 // Set to true to enable debug mode. Prints results into terminal.
@@ -35,10 +36,8 @@ class EncDec
 	CryptoPP::SecByteBlock m_iv;
 
 	public:
-	explicit EncDec()
-	{
-		m_iv = generateIV();
-	}
+	
+	explicit EncDec() {}
 
 	CryptoPP::SecByteBlock generateIV()
 	{
@@ -84,7 +83,7 @@ class EncDec
 			} while (bit_index % BYTE_SIZE != 0);
 		}
 
-		if (DEBUG_MODE) std::cout << std::format("Resulting bits: {}", bits.to_string()) << std::endl;
+		if (DEBUG_MODE) std::cout << std::format("Resulting bits: {}\n\n\n\n\n", bits.to_string()) << std::endl;
 
 		return bits;
 	}
@@ -117,8 +116,15 @@ class EncDec
 		return key;
 	}
 
-	std::string encrypt(std::string password, std::string plaintext)
+	std::string encrypt(const std::string& password, const std::string& plaintext)
 	{
+		if(DEBUG_MODE)
+		{
+			std::cout << std::format("Encrypting message: {}, with password: {}\n", plaintext, password);
+		}
+
+		m_iv = generateIV(); // Create a new IV to enhance security.
+
 		CryptoPP::SecByteBlock key{stringToKey(password)};
 
 		CryptoPP::EAX<CryptoPP::AES>::Encryption encryptor;
@@ -128,7 +134,7 @@ class EncDec
 		CryptoPP::StringSource ss(plaintext, true, new CryptoPP::AuthenticatedEncryptionFilter(encryptor, new CryptoPP::StringSink(ciphertext)));
 
 		// "Tamper"
-		ciphertext[0] ^= 0x01;
+		//ciphertext[0] ^= 0x01;
 
 		std::string cipher_string{""};
 		CryptoPP::StringSource rs(ciphertext, true, new CryptoPP::HexEncoder(new CryptoPP::StringSink(cipher_string)));
@@ -140,12 +146,44 @@ class EncDec
 		std::string return_string{""};
 		return_string += iv_string + cipher_string;
 
-		m_iv = generateIV(); // Create a new IV to enhance security.
+		if(DEBUG_MODE)
+		{
+			std::cout << std::format("IV Hex: {}\nMessage Hex: {}\nResulting Hex: {}\n", iv_string, cipher_string, return_string);
+		}
+		
 		return return_string;
 	}
 
-	std::string decrypt(std::string password, std::string ciphertext)
+	std::string decrypt(const std::string& password, const std::string& ciphertext)
 	{
+		if(DEBUG_MODE)
+		{
+			std::cout << std::format("Decrypting message: {}, with password: {}\n", ciphertext, password);
+		}
 
+		CryptoPP::SecByteBlock key{stringToKey(password)};
+
+		// Retrieve the IV from the ciphertext. Every char is represented as two hexadecimal values.
+		std::string iv_hex{ciphertext.substr(0, HEXADECIMAL * 2)};
+		std::string iv_str{""};
+		CryptoPP::StringSource ss_iv(iv_hex, true, new CryptoPP::HexDecoder(new CryptoPP::StringSink(iv_str)));
+		CryptoPP::SecByteBlock iv((const uint8_t*)(iv_str.c_str()), KEY_LENGTH);
+
+		CryptoPP::EAX<CryptoPP::AES>::Decryption decryptor;
+		decryptor.SetKeyWithIV(key, key.size(), iv, iv.size());
+
+		std::string message_hex{ ciphertext.substr(iv_hex.length(), ciphertext.length()) };
+		std::string encrypted_message{""};
+		CryptoPP::StringSource ss_msg(message_hex, true, new CryptoPP::HexDecoder(new CryptoPP::StringSink(encrypted_message)));
+		
+		std::string plaintext{""};
+		CryptoPP::StringSource ss(encrypted_message, true, new CryptoPP::AuthenticatedDecryptionFilter(decryptor, new CryptoPP::StringSink(plaintext)));
+
+		if(DEBUG_MODE)
+		{
+			std::cout << std::format("Resulting message: {}\n", plaintext);
+		}
+		
+		return plaintext;
 	}
 };
