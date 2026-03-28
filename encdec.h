@@ -108,20 +108,18 @@ class EncDec
 		return string_out;
 	}
 
-	//CryptoPP::SecByteBlock
-	void stringToKey(std::string password)
+	CryptoPP::SecByteBlock stringToKey(std::string password)
 	{
 		// Truncate password
-		std::bitset<BYTE_SIZE* KEY_LENGTH> password_bits{ generateBytes(password) };
-		std::string key_string{ bitsToString(password_bits) };
+		std::bitset<BYTE_SIZE* KEY_LENGTH> password_bits{generateBytes(password)};
+		std::string key_string{bitsToString(password_bits)};
+		CryptoPP::SecByteBlock key((const uint8_t*)(key_string.c_str()), KEY_LENGTH); // Pass in an unsigned char array pointer, of length KEY_LENGTH. Unsigned char just means a byte of data without a bit used for sign. A.K.A. a character.
+		return key;
 	}
 
 	std::string encrypt(std::string password, std::string plaintext)
 	{
-
-		std::bitset<BYTE_SIZE* KEY_LENGTH> password_bytes{ generateBytes(password) };
-		std::string new_password{bitsToString(password_bytes)};
-		CryptoPP::SecByteBlock key((const uint8_t*)(new_password.c_str()), KEY_LENGTH); // Pass in an unsigned char array pointer, of length KEY_LENGTH. Unsigned char just means a byte of data without a bit used for sign. A.K.A. a character.
+		CryptoPP::SecByteBlock key{stringToKey(password)};
 
 		CryptoPP::EAX<CryptoPP::AES>::Encryption encryptor;
 		encryptor.SetKeyWithIV(key, key.size(), m_iv, m_iv.size());
@@ -146,4 +144,8 @@ class EncDec
 		return return_string;
 	}
 
+	std::string decrypt(std::string password, std::string ciphertext)
+	{
+
+	}
 };
