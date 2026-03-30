@@ -104,6 +104,10 @@ class PatientProfile final : public Profile
     time_t getExpectedTimeOfStay() const { return m_expected_time_of_stay; }
     void setExpectedTimeOfStay(time_t expected_time_of_stay) { m_expected_time_of_stay = expected_time_of_stay; }
 
+    Unit getAdmittedUnit() const { return m_admitted_unit; }
+    void setAdmittedUnit(Unit admitted_unit) { m_admitted_unit = admitted_unit; }
+    int getAdmittedUnitInt() const { return static_cast<int>(m_admitted_unit); }
+
     std::string toString() const override { return std::format("{} {} {} {} {} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_dob, m_creation_date, m_reason_of_admission, m_time_of_admission, m_expected_time_of_stay, size_t(m_admitted_unit)); }
     std::string toFormattedString() const override
     {
@@ -161,9 +165,25 @@ class StaffProfile final : public Profile
     {
         const char DELIMETER_SYMBOL{','};
         std::string shifts_string{""};
-        for(size_t shift_index{0}; shift_index < MAXIMUM_STORED_SHIFTS - 1; shift_index++) { shifts_string += m_shifts[shift_index].toString() + DELIMETER_SYMBOL; }
+        for(size_t shift_index{0}; shift_index < MAXIMUM_STORED_SHIFTS; shift_index++) {shifts_string += m_shifts[shift_index].toString() + DELIMETER_SYMBOL; }
         return shifts_string;
     }
+
+    std::string getShiftExportString() const {
+        std::string shifts_export_string;
+        for(size_t shift_index{0}; shift_index < MAXIMUM_STORED_SHIFTS - 1; shift_index++) {shifts_export_string += std::format("{}\\{}|", m_shifts[shift_index].time_block_start, m_shifts[shift_index].time_block_end);}
+        return format("{}{}\\{}", shifts_export_string, m_shifts[MAXIMUM_STORED_SHIFTS - 1].time_block_start, m_shifts[MAXIMUM_STORED_SHIFTS - 1].time_block_end);
+    
+    }
+
+    std::string getRoomString() const
+    {
+        const char DELIMETER_SYMBOL{'|'};
+        std::string room_string{""};
+        for(size_t shift_index{0}; shift_index < m_assigned_rooms.size() - 1; shift_index++) { room_string += m_assigned_rooms[shift_index] + DELIMETER_SYMBOL; }
+        return std::format("{}{}", room_string, m_assigned_rooms[m_assigned_rooms.size() - 1]); // removes the delimeter after the last value which causes getline errors
+    }
+
     void setShifts(std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts) { m_shifts = shifts; }
 
     Unit getAssignedUnit() const { return m_assigned_unit; }
@@ -172,7 +192,7 @@ class StaffProfile final : public Profile
     std::vector<std::string> getAssignedRooms() const { return m_assigned_rooms; }
     void setAssignedRooms(std::vector<std::string> assigned_rooms) { m_assigned_rooms = assigned_rooms; }
 
-    std::string toString() const override { return std::format("{} {} {} {} {} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_dob, m_creation_date, m_occupation, m_wage, getShiftsString(), size_t(m_assigned_unit)); }
+    std::string toString() const override { return std::format("{} {} {} {} {} {} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_dob, m_creation_date, m_occupation, m_wage, getShiftsString(), size_t(m_assigned_unit), getRoomString()); }
     std::string toFormattedString() const override
     {
         std::string dob_string{ctime(&m_dob)};

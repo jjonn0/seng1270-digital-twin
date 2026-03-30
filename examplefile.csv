@@ -1,1 +1,3 @@
-Profile number,First name,Last name,Age,Reason of admission,Time of admission,Expected time of stay,Creation date
+"Profile number","First name","Last name","Date of birth","Reason of admission","Time of admission","Expected time of stay","Creation date","Admitted unit",
+67,Jonathon,Oldegbers,2,"Digitally twinned too hard",12345,151223,123456,0
+69,Jonathon,Oldegbers,299999,"Digitally twinned way too hard",9120,11111,0,2,
