@@ -3,7 +3,7 @@
 #include <wx/Timer.h>
 #include <wx/simplebook.h>
 #include <vector>
-#include "ProfilePage.h"
+#include "PatientPage.h"
 #include "StatusPage.h"
 #include "profiles.h"
 
@@ -12,19 +12,25 @@ class MainFrame : public wxFrame
 {
 public:
 	MainFrame(const wxString& title);
+	std::vector<PatientProfile> m_patient;
+	std::vector<StaffProfile> m_staff;
+	void AdmitPatient(const std::string& f, const std::string& l, const std::string& r, time_t dob);
+	void AdmitStaff(const std::string& f, const std::string& l, const std::string& j, time_t dob);
+
+
+
 private:
 	wxTimer m_timer;
+	time_t m_timeDif;	
 	wxSimplebook* pageContainer;
 	wxPanel* page1;
-	ProfilePage* page2;
+	PatientPage* page2;
 	StatusPage* page3;
 	wxStaticText* m_timeText;
 	PatientProfile* m_currentPatient;
 	StaffProfile* m_currentStaff;
 	void OnTimer(wxTimerEvent& evt);
-	void OnKeyEvent(wxKeyEvent& evt);
-	std::vector<PatientProfile> m_patient;
-	int m_Index = 0;
+
 
 	wxDECLARE_EVENT_TABLE();
 };
