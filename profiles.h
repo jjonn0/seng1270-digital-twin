@@ -1,4 +1,7 @@
+// @warning Uses deprecated ctime functions. If time allowed, ctime_s should have replaced it but there is not enough time.
+#define _CRT_SECURE_NO_WARNINGS 1
 #pragma once
+
 #include <iostream>
 #include <string>
 #include <ctime>
@@ -36,7 +39,13 @@ struct TimeBlock
     {
         std::string time_start{ctime(&time_block_start)};
         std::string time_end{ctime(&time_block_end)};
-        return std::format("{}{}", time_start, time_end);
+        std::string return_string{""};
+        return_string += time_start;
+        return_string.pop_back();
+        return_string += " - ";
+        return_string += time_end;
+        //return_string.pop_back();
+        return return_string;
     }
 };
 
@@ -76,7 +85,7 @@ class PatientProfile final : public Profile
     public:
     // Creating a new patient profile
     PatientProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = 0, std::string reason_of_admission = "<unknown>", time_t time_of_admission = 0, time_t expected_time_of_stay = 0, Unit admitted_unit = GENERAL) : 
-    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name{last_name}, m_dob{dob}, m_reason_of_admission{reason_of_admission}, m_time_of_admission{time_of_admission}, m_expected_time_of_stay{expected_time_of_stay}, m_creation_date{time_t(nullptr)}, m_admitted_unit{admitted_unit} {}
+    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name{last_name}, m_dob{dob}, m_reason_of_admission{reason_of_admission}, m_time_of_admission{time_of_admission}, m_expected_time_of_stay{expected_time_of_stay}, m_creation_date{time_t()}, m_admitted_unit{admitted_unit} {}
 
     // Creating a patient profile from a pre-existing patient profile
     PatientProfile(size_t profile_number, std::string first_name, std::string last_name, time_t dob, std::string reason_of_admission, time_t time_of_admission, time_t expected_time_of_stay, time_t creation_date, Unit admitted_unit) : 
@@ -136,7 +145,7 @@ class StaffProfile final : public Profile
 
     public:
     StaffProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = 0, std::string occupation = "<unknown>", size_t wage = 0, std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts = {}, Unit asssigned_unit = GENERAL, std::vector<std::string> assigned_rooms = {}) :
-    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name {last_name}, m_dob{dob}, m_occupation{occupation}, m_wage{wage}, m_shifts{shifts}, m_assigned_unit{asssigned_unit}, m_assigned_rooms{assigned_rooms}, m_creation_date{time_t(nullptr)} {}
+    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name {last_name}, m_dob{dob}, m_occupation{occupation}, m_wage{wage}, m_shifts{shifts}, m_assigned_unit{asssigned_unit}, m_assigned_rooms{assigned_rooms}, m_creation_date{time_t()} {}
 
     StaffProfile(size_t profile_number, std::string first_name, std::string last_name, time_t dob, std::string occupation, size_t wage, time_t creation_date, std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts, Unit asssigned_unit, std::vector<std::string> assigned_rooms) :
     m_profile_number{profile_number}, m_first_name{first_name}, m_last_name {last_name}, m_dob{dob}, m_occupation{occupation}, m_wage{wage}, m_shifts{shifts}, m_assigned_unit{asssigned_unit}, m_assigned_rooms{assigned_rooms}, m_creation_date{creation_date} {}
@@ -165,7 +174,13 @@ class StaffProfile final : public Profile
     {
         const char DELIMETER_SYMBOL{','};
         std::string shifts_string{""};
-        for(size_t shift_index{0}; shift_index < MAXIMUM_STORED_SHIFTS; shift_index++) {shifts_string += m_shifts[shift_index].toString() + DELIMETER_SYMBOL; }
+        for(size_t shift_index{0}; shift_index < MAXIMUM_STORED_SHIFTS; shift_index++)
+        { 
+            shifts_string += m_shifts[shift_index].toString();
+            shifts_string.pop_back();
+            shifts_string += DELIMETER_SYMBOL;
+            shifts_string += "\n";
+        }
         return shifts_string;
     }
 
@@ -180,6 +195,7 @@ class StaffProfile final : public Profile
     {
         const char DELIMETER_SYMBOL{'|'};
         std::string room_string{""};
+        if(m_assigned_rooms.size() == 0) { return ""; }
         for(size_t shift_index{0}; shift_index < m_assigned_rooms.size() - 1; shift_index++) { room_string += m_assigned_rooms[shift_index] + DELIMETER_SYMBOL; }
         return std::format("{}{}", room_string, m_assigned_rooms[m_assigned_rooms.size() - 1]); // removes the delimeter after the last value which causes getline errors
     }
