@@ -80,11 +80,18 @@
 			if (ss >> year >> month >> day) {
 				time_t newTime = getTimestamp(year, month, day);
 				time_t actualTime = wxDateTime::Now().GetTicks();
+				time_t timeCap = actualTime + (100LL*365*24*3600);
 				if (newTime < actualTime) {
 					wxMessageBox("Time cannot be set to the past.", "Invalid Time", wxOK | wxICON_ERROR);
 					timeInp->Clear();
 					return;
 				}
+				if (newTime > timeCap) {
+					wxMessageBox("Cannot input time over 100 years", "Invalid Time", wxOK);
+					timeInp->Clear();
+					return;
+				}
+
 				else {
 					this->m_timeDif = newTime - actualTime;
 					wxMessageBox("Updated");
@@ -145,7 +152,7 @@
 		if (ss >> year >> month >> day) {
 			dob = getTimestamp(year, month, day);
 			wxDateTime dobDate(dob);
-			if (!dobDate.IsValid()) {
+			if (dobDate > m_frame1->	getSimTime()) {
 				
 			wxMessageBox("Date of birth cannot be in the future.", "Invalid Date", wxOK | wxICON_ERROR);
 			return;
