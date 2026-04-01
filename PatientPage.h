@@ -87,10 +87,13 @@ public:
 	void UpdateDisplay(const std::vector<PatientProfile>&patient, const std::vector<StaffProfile>& staff, time_t currenttime) {
 		m_patientTot = "";
 		m_staffPage->UpdateDisplay(staff, currenttime);
+		wxDateTime simNow(currenttime);
 		for (const auto& pat : patient) {
 			wxDateTime dob(pat.getDOB());
-			wxDateTime now = wxDateTime::Now();
-			int age = now.GetYear() - dob.GetYear();
+			// if (dob > currenttime) {
+			// 	return;
+			// }
+			int age = simNow.GetYear() - dob.GetYear();
 			wxString fullName = wxString::FromUTF8(pat.getFirstName() + " " + pat.getLastName());
 			wxString reason = wxString::FromUTF8(pat.getReasonOfAdmission());
 			m_patientTot += wxString::Format("Patient: %s\nAge: %d\nReason %s\nID: %s\n\n", fullName, age ,reason, pat.getProfileNumber());
@@ -100,8 +103,8 @@ public:
 		m_patientLabel->Wrap(m_scrolledWindow1->GetClientSize().GetWidth());
 		m_scrolledWindow1->FitInside();
 		m_scrolledWindow1->Scroll(0, m_scrolledWindow1->GetScrollLines(wxVERTICAL));
-		wxDateTime now(currenttime);
 		//m_staffShifts->SetLabel("Active Staff: " + wxString::FromUTF8(staff.getFirstName()));
+		m_scrollSizer->Layout();
 		this->Layout();
 	}
 		void OnAdmit(wxCommandEvent& evt);
