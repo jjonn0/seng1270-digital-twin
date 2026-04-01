@@ -40,8 +40,8 @@ public:
 			time_t addedTime = pat.getTimeOfAdmission();
 			time_t expectedStay = pat.getExpectedTimeOfStay();
 			time_t timeStayed = newTime - addedTime;
-			int years = timeStayed / (365 * 24 * 3600);
-			time_t remTime = timeStayed % (365 * 24 * 3600);
+			int years = timeStayed / 31536000;
+			time_t remTime = timeStayed % 31536000;
 			int months = remTime / (30 * 24 * 3600);
 			remTime = remTime % (30 * 24 * 3600);
 			int days = remTime / (24 * 3600);
@@ -52,7 +52,7 @@ public:
 			remTime = remTime % 60;
 			int seconds = remTime;
 
-			m_patInfo += wxString::Format("Patient: %s %s\n, Reason of Admission: %s\n, Time of Admission: %s\n, Current Time Stayed: Years: %d, Months: %d, Days: %d, Hours: %d, Minutes: %d, Seconds: %d\n\n", pat.getFirstName(), pat.getLastName(), pat.getReasonOfAdmission(), wxDateTime(pat.getTimeOfAdmission()).Format("%Y-%m-%d"), years, months, days, hours, minutes, seconds);
+			m_patInfo += wxString::Format("Patient: %s %s\nReason of Admission: %s\nTime of Admission: %s\nCurrent Time Stayed: Years: %d, Months: %d, Days: %d - %d : %d : %d\n\n", pat.getFirstName(), pat.getLastName(), pat.getReasonOfAdmission(), wxDateTime(pat.getTimeOfAdmission()).Format("%Y-%m-%d"), years, months, days, hours, minutes, seconds);
 
 		}
 		m_displayInfo->SetLabel(m_patInfo);
