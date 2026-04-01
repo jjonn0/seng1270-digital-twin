@@ -51,58 +51,67 @@ struct TimeBlock
 
 class Profile
 {
+    private:
+    std::string m_first_name;                  // The first name of the person on profile.
+    std::string m_last_name;                   // The last name of the person on profile.
+    time_t m_dob;                              // The age of the person on profile.
+    time_t m_creation_date;                    // The data the profile was created. This is assigned automatically, unless specified at the end of the constructor.
+    const size_t m_profile_number;             // The internal profile number. This is not created automatically, and must be manually assigned during construction.
+    Unit m_assigned_unit;                      // The unit that the profile is assigned to.
+    std::vector<std::string> m_assigned_rooms; // The rooms that the profile is assigned to.
+
     public:
-    virtual std::string getFirstName() const = 0;
-    virtual void setFirstName(std::string first_name) = 0;
+        Profile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = time_t(), Unit assigned_unit = Unit::GENERAL, std::vector<std::string> assigned_rooms = {}, time_t creation_date = time_t()) : 
+            m_profile_number{profile_number}, m_first_name{first_name}, m_last_name{last_name}, m_dob{dob}, m_assigned_unit{assigned_unit}, m_assigned_rooms{assigned_rooms}, m_creation_date{creation_date} {}
 
-    virtual std::string getLastName() const = 0;
-    virtual void setLastName(std::string last_name) = 0;
+    std::string getFirstName() const { return m_first_name; }
+    void setFirstName(std::string first_name) { m_first_name = first_name; }
 
-    virtual time_t getDOB() const = 0;
-    virtual void setDOB(time_t dob) = 0;
+    std::string getLastName() const { return m_last_name; }
+    void setLastName(std::string last_name) { m_last_name = last_name; }
 
-    virtual time_t getCreationDate() const = 0;
+    time_t getDOB() const { return m_dob; }
+    void setDOB(time_t dob) { m_dob = dob; }
 
-    virtual size_t getProfileNumber() const = 0;
+    time_t getCreationDate() const { return m_creation_date; }
 
-    virtual std::string toString() const = 0;
-    virtual std::string toFormattedString() const = 0;
+    size_t getProfileNumber() const { return m_profile_number; }
+
+    Unit getAssignedUnit() const { return m_assigned_unit; }
+    void setAssignedUnit(Unit assigned_unit) { m_assigned_unit = assigned_unit; }
+
+    std::vector<std::string> getAssignedRooms() const { return m_assigned_rooms; }
+    void setAssignedRooms(std::vector<std::string> assigned_rooms) { m_assigned_rooms = assigned_rooms; }
+
+    std::string getRoomString() const
+    {
+        const char DELIMETER_SYMBOL{ '|' };
+        std::string room_string{ "" };
+        if (m_assigned_rooms.size() == 0) { return ""; }
+        for (size_t shift_index{ 0 }; shift_index < m_assigned_rooms.size() - 1; shift_index++) { room_string += m_assigned_rooms[shift_index] + DELIMETER_SYMBOL; }
+        return std::format("{}{}", room_string, m_assigned_rooms[m_assigned_rooms.size() - 1]); // removes the delimeter after the last value which causes getline errors
+    }
+
+    std::string toString() const { return std::format("{} {} {} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_dob, m_creation_date, int(m_assigned_unit), getRoomString()); };
 };
 
 class PatientProfile final : public Profile
 {
     private:
-    std::string m_first_name;           // The first name of the person on profile.
-    std::string m_last_name;            // The last name of the person on profile.
-    time_t m_dob;                       // The age of the person on profile.
-    time_t m_creation_date;             // The data the profile was created. This is assigned automatically, unless specified at the end of the constructor.
-    size_t m_profile_number;            // The internal profile number. This is not created automatically, and must be manually assigned during construction.
+    
     std::string m_reason_of_admission;  // The reason the patient is admitted to the hospital.
     time_t m_time_of_admission;         // The time at which the patient was processed.
     time_t m_expected_time_of_stay;     // The time at which the patient is expected to have been discharged.
-    Unit m_admitted_unit;               // The unit that the patient is admitted to.
+    
 
     public:
     // Creating a new patient profile
-    PatientProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = 0, std::string reason_of_admission = "<unknown>", time_t time_of_admission = 0, time_t expected_time_of_stay = 0, Unit admitted_unit = GENERAL) : 
-    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name{last_name}, m_dob{dob}, m_reason_of_admission{reason_of_admission}, m_time_of_admission{time_of_admission}, m_expected_time_of_stay{expected_time_of_stay}, m_creation_date{time_t()}, m_admitted_unit{admitted_unit} {}
+        PatientProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = 0, std::string reason_of_admission = "<unknown>", time_t time_of_admission = 0, time_t expected_time_of_stay = 0, Unit admitted_unit = GENERAL, std::vector<std::string> assigned_rooms = {}) : 
+    Profile(profile_number, first_name, last_name, dob, admitted_unit, assigned_rooms), m_reason_of_admission{reason_of_admission}, m_time_of_admission{time_of_admission}, m_expected_time_of_stay{expected_time_of_stay} {}
 
     // Creating a patient profile from a pre-existing patient profile
-    PatientProfile(size_t profile_number, std::string first_name, std::string last_name, time_t dob, std::string reason_of_admission, time_t time_of_admission, time_t expected_time_of_stay, time_t creation_date, Unit admitted_unit) : 
-    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name{last_name}, m_dob{dob}, m_reason_of_admission{reason_of_admission}, m_time_of_admission{time_of_admission}, m_expected_time_of_stay{expected_time_of_stay}, m_creation_date{creation_date}, m_admitted_unit{admitted_unit} {}
-
-    std::string getFirstName() const override { return m_first_name; }
-    void setFirstName(std::string first_name) override { m_first_name = first_name; }
-
-    std::string getLastName() const override { return m_last_name; }
-    void setLastName(std::string last_name) override { m_last_name = last_name; }
-
-    time_t getDOB() const override { return m_dob; }
-    void setDOB(time_t dob) override { m_dob = dob; }
-
-    time_t getCreationDate() const override { return m_creation_date; }
-
-    size_t getProfileNumber() const override { return m_profile_number; }
+    PatientProfile(size_t profile_number, std::string first_name, std::string last_name, time_t dob, std::string reason_of_admission, time_t time_of_admission, time_t expected_time_of_stay, time_t creation_date, Unit admitted_unit, std::vector<std::string> assigned_rooms) :
+    Profile(profile_number, first_name, last_name, dob, admitted_unit, assigned_rooms, creation_date), m_reason_of_admission{reason_of_admission}, m_time_of_admission{time_of_admission}, m_expected_time_of_stay{expected_time_of_stay} {}
 
     std::string getReasonOfAdmission() const { return m_reason_of_admission; }
     void setReasonOfAdmission(std::string reason_of_admission) { m_reason_of_admission = reason_of_admission; }
@@ -113,55 +122,24 @@ class PatientProfile final : public Profile
     time_t getExpectedTimeOfStay() const { return m_expected_time_of_stay; }
     void setExpectedTimeOfStay(time_t expected_time_of_stay) { m_expected_time_of_stay = expected_time_of_stay; }
 
-    Unit getAdmittedUnit() const { return m_admitted_unit; }
-    void setAdmittedUnit(Unit admitted_unit) { m_admitted_unit = admitted_unit; }
-    int getAdmittedUnitInt() const { return static_cast<int>(m_admitted_unit); }
+    int getAdmittedUnitInt() const { return static_cast<int>(Profile::getAssignedUnit()); }
 
-    std::string toString() const override { return std::format("{} {} {} {} {} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_dob, m_creation_date, m_reason_of_admission, m_time_of_admission, m_expected_time_of_stay, size_t(m_admitted_unit)); }
-    std::string toFormattedString() const override
-    {
-        std::string dob_string{ctime(&m_dob)};
-        std::string profile_creation_date_string{ctime(&m_creation_date)};
-        std::string time_of_admission_string{ctime(&m_time_of_admission)};
-        std::string expected_time_of_stay_string{ctime(&m_expected_time_of_stay)};
-        return std::format("Profile Number: {:<20d} | Last Name: {:<20s} | First Name: {:<20s} | DOB: {:<s}\nProfile Creation Date: {:<s}Reason of Admission: {:<s}\nTime of Admission: {:<s}\nExpected Time of Stay: {:<s}",
-        m_profile_number, m_last_name, m_first_name, dob_string, profile_creation_date_string, m_reason_of_admission, time_of_admission_string, expected_time_of_stay_string);
-    }
+    std::string toString() const { return std::format("{} {} {} {}", Profile::toString(), m_reason_of_admission, m_time_of_admission, m_expected_time_of_stay); }
 };
 
 class StaffProfile final : public Profile
 {
     private:
-    std::string m_first_name;                                // The first name of the person on profile.
-    std::string m_last_name;                                 // The last name of the person on profile.
-    time_t m_dob;                                            // The age of the person on profile.
-    time_t m_creation_date;                                  // The data the profile was created. This is assigned automatically, unless specified at the end of the constructor.
-    size_t m_profile_number;                                 // The internal profile number. This is not created automatically, and must be manually assigned during construction.
     std::string m_occupation;                                // The occupation the staff member belongs to.
     size_t m_wage;                                           // The wage the staff member recieves. Uses a non-decimal number to avoid floating-point precision errors. Example: 2005 will be treated as $20.05/hr.
     std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> m_shifts;   // The shifts the staff member is working.
-    Unit m_assigned_unit;                                    // The unit the staff member is assigned to. GENERAL for non-specific unit.
-    std::vector<std::string> m_assigned_rooms;
 
     public:
     StaffProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = 0, std::string occupation = "<unknown>", size_t wage = 0, std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts = {}, Unit asssigned_unit = GENERAL, std::vector<std::string> assigned_rooms = {}) :
-    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name {last_name}, m_dob{dob}, m_occupation{occupation}, m_wage{wage}, m_shifts{shifts}, m_assigned_unit{asssigned_unit}, m_assigned_rooms{assigned_rooms}, m_creation_date{time_t()} {}
+    Profile(profile_number, first_name, last_name, dob, asssigned_unit, assigned_rooms), m_occupation{occupation}, m_wage{wage}, m_shifts{shifts} {}
 
     StaffProfile(size_t profile_number, std::string first_name, std::string last_name, time_t dob, std::string occupation, size_t wage, time_t creation_date, std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts, Unit asssigned_unit, std::vector<std::string> assigned_rooms) :
-    m_profile_number{profile_number}, m_first_name{first_name}, m_last_name {last_name}, m_dob{dob}, m_occupation{occupation}, m_wage{wage}, m_shifts{shifts}, m_assigned_unit{asssigned_unit}, m_assigned_rooms{assigned_rooms}, m_creation_date{creation_date} {}
-
-    std::string getFirstName() const override { return m_first_name; }
-    void setFirstName(std::string first_name) override { m_first_name = first_name; }
-
-    std::string getLastName() const override { return m_last_name; }
-    void setLastName(std::string last_name) override { m_last_name = last_name; }
-
-    time_t getDOB() const override { return m_dob; }
-    void setDOB(time_t dob) override { m_dob = dob; }
-
-    time_t getCreationDate() const override { return m_creation_date; }
-
-    size_t getProfileNumber() const override { return m_profile_number; }
+        Profile(profile_number, first_name, last_name, dob, asssigned_unit, assigned_rooms, creation_date), m_occupation{occupation}, m_wage{wage}, m_shifts{shifts} {}
 
     std::string getOccupation() const { return m_occupation; }
     void setOccupation(std::string occupation) { m_occupation = occupation; }
@@ -191,29 +169,7 @@ class StaffProfile final : public Profile
     
     }
 
-    std::string getRoomString() const
-    {
-        const char DELIMETER_SYMBOL{'|'};
-        std::string room_string{""};
-        if(m_assigned_rooms.size() == 0) { return ""; }
-        for(size_t shift_index{0}; shift_index < m_assigned_rooms.size() - 1; shift_index++) { room_string += m_assigned_rooms[shift_index] + DELIMETER_SYMBOL; }
-        return std::format("{}{}", room_string, m_assigned_rooms[m_assigned_rooms.size() - 1]); // removes the delimeter after the last value which causes getline errors
-    }
-
     void setShifts(std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts) { m_shifts = shifts; }
 
-    Unit getAssignedUnit() const { return m_assigned_unit; }
-    void setAssignedUnit(Unit assigned_unit) { m_assigned_unit = assigned_unit; }
-
-    std::vector<std::string> getAssignedRooms() const { return m_assigned_rooms; }
-    void setAssignedRooms(std::vector<std::string> assigned_rooms) { m_assigned_rooms = assigned_rooms; }
-
-    std::string toString() const override { return std::format("{} {} {} {} {} {} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_dob, m_creation_date, m_occupation, m_wage, getShiftsString(), size_t(m_assigned_unit), getRoomString()); }
-    std::string toFormattedString() const override
-    {
-        std::string dob_string{ctime(&m_dob)};
-        std::string profile_creation_date_string{ctime(&m_creation_date)};
-        return std::format("Profile Number: {:<20d} | Last Name: {:<20s} | First Name: {:<20s} | DOB: {:<s}\nProfile Creation Date: {:<s}Occupation: {:<s}\nWage: {:<d}\nShifts: {:<s}\nAssigned Unit: {:<d}",
-        m_profile_number, m_last_name, m_first_name, dob_string, profile_creation_date_string, m_occupation, m_wage, getShiftsString(), size_t(m_assigned_unit));
-    }
+    std::string toString() const { return std::format("{} {} {} {}", Profile::toString(), m_occupation, m_wage, getShiftsString()); }
 };
