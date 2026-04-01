@@ -16,12 +16,15 @@ public:
 	std::vector<StaffProfile> m_staff;
 	void AdmitPatient(const std::string& f, const std::string& l, const std::string& r, time_t dob);
 	void AdmitStaff(const std::string& f, const std::string& l, const std::string& j, time_t dob);
+	time_t getSimTime() {
+		return wxDateTime::Now().GetTicks() + m_timeDif;
+	};
 
 
 
 private:
 	wxTimer m_timer;
-	time_t m_timeDif;	
+	time_t m_timeDif = 0;
 	wxSimplebook* pageContainer;
 	wxPanel* page1;
 	PatientPage* page2;
