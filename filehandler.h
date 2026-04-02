@@ -139,10 +139,9 @@ class FileHandler
         }
         return profiles;
     }
-    
+
     /// @brief dont use this function, use savePatientData for a single patient, and saveAllPatientData for a vector of patient data 
-    static void writePatientData(PatientProfile patient, std::string filename, size_t row, std::string password, EncDec encdec) {
-        rapidcsv::Document file(filename);
+    static void writePatientData(PatientProfile patient, std::string filename, size_t row, std::string password, EncDec encdec, rapidcsv::Document file) {
         std::string profile_number{std::to_string(patient.getProfileNumber())};
         std::string first_name{patient.getFirstName()};
         std::string last_name{patient.getLastName()};
@@ -179,8 +178,8 @@ class FileHandler
         file.Save(filename);
     }
 
-    static void writeStaffData(StaffProfile staff, std::string filename, size_t row, std::string password, EncDec encdec) {
-        rapidcsv::Document file(filename);
+    /// @brief dont use this function, use saveStaffData for a single staff member, and saveAllStaffData for a vector of patient data 
+    static void writeStaffData(StaffProfile staff, std::string filename, rapidcsv::Document file, size_t row, std::string password, EncDec encdec) {
         std::string profile_number{ std::to_string(staff.getProfileNumber())};
         std::string first_name{staff.getFirstName()};
         std::string last_name{staff.getLastName()};
@@ -220,7 +219,12 @@ class FileHandler
         file.Save(filename);
     }
 
-    /// @brief Saves the data for a single patient. Uses the profile number to reference
+    //========================================================================================================================================================================
+
+    /// @brief Saves over the old data of a patient with the new data. Use for one profile
+    /// @param patient The new patientProfile data. Make sure it has the same profile number as the original patient profile
+    /// @param filename The name of the file to save the data to
+    /// @param password The encryption password
     static void savePatientData(PatientProfile patient, std::string filename, std::string password) {
         EncDec encdec;
         rapidcsv::Document file(filename);
@@ -228,15 +232,18 @@ class FileHandler
         {
             for (size_t row{0}; row < file.GetRowCount(); row++) {
                 if (file.GetCell<size_t>(columns.c_profile_number, row) == patient.getProfileNumber()) {
-                    writePatientData(patient, filename, row, password, encdec);
+                    writePatientData(patient, filename, row, password, encdec, file);
                     return;
                 }
             }
         }
-        writePatientData(patient, filename, (file.GetRowCount()), password, encdec); // Saves to a new row
+        writePatientData(patient, filename, (file.GetRowCount()), password, encdec, file); // Saves to a new row
     }
 
-    /// @brief Saves the data for a single staff member. Uses the profile number to reference
+    /// @brief Saves over the old data of a staff with new data. Use for one profile
+    /// @param staff The new staffProfile data. Make sure that it has the same profile number as the original staff profile
+    /// @param filename The name of the file to save the data to
+    /// @param password The encryption password
     static void saveStaffData(StaffProfile staff, std::string filename, std::string password) {
         EncDec encdec;
         rapidcsv::Document file(filename);
@@ -244,11 +251,55 @@ class FileHandler
         {
             for(size_t row{0}; row < file.GetRowCount(); row++) {
                 if (file.GetCell<size_t>(columns.c_profile_number, row) == staff.getProfileNumber()) {
-                    writeStaffData(staff, filename, row, password, encdec);
+                    writeStaffData(staff, filename, file, row, password, encdec);
                     return;
                 }
             }
         }
-        writeStaffData(staff, filename, (file.GetRowCount()), password, encdec); // Saves to a new row
+        writeStaffData(staff, filename, file, file.GetRowCount(), password, encdec); // Saves to a new row
     }
+
+    //========================================================================================================================================================================
+    
+    /// @brief Saves all of the patient data from a vector to a file.
+    /// @param pProfiles A vector of patientProfiles
+    /// @param filename The file to save the data to
+    /// @param encdec An encdec? I don't know what this is...ask Jonathon I guess
+    /// @param password The encryption password
+    static void saveAllPatientData(std::vector<PatientProfile> pProfiles, std::string filename, EncDec encdec, std::string password) {
+        rapidcsv::Document file(filename);
+        for(size_t i{0}; i < pProfiles.size(); i++) {
+            writePatientData(pProfiles[i], filename, i, password, encdec, file);
+        }
+    }
+
+    /// @brief Saves all of the staff data from a vector to a file.
+    /// @param sProfiles A vector of staffProfiles
+    /// @param filename The file to save the data to
+    /// @param encdec An encdec? I don't know what this is...ask Jonathon I guess
+    /// @param password The encryption password
+    static void saveAllStaffData(std::vector<StaffProfile> sProfiles, std::string filename, EncDec encdec, std::string password) {
+        rapidcsv::Document file(filename);
+        for (size_t i{0}; i < sProfiles.size(); i++) {
+            writeStaffData(sProfiles[i], filename, file, i, password, encdec);
+        }
+    }
+
+    //========================================================================================================================================================================
+
+    /// @warning I never tested this, but it should work as intended, and we can remove this if we don't need it
+    /// @brief Removes a profile from its save file, we might not need this I made it just in case things get weird
+    /// @param profile_number the profile number. Can be a patient or staff profile
+    /// @param filename the name of the file. Use the corresponding file for a patient or staff profile
+    static void removeProfile(size_t profile_number, std::string filename) {
+        rapidcsv::Document file(filename);
+        for (size_t index{0}; index < file.GetRowCount(); index++) {
+            if (profile_number == file.GetCell<size_t>(columns.c_profile_number, index)) {
+                file.RemoveRow(index);
+                return;
+            }
+        }
+    }
+
 };
+
