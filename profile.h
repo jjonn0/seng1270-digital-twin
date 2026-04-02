@@ -11,7 +11,7 @@
 
 
 
-const size_t MAXIMUM_STORED_SHIFTS{ 10 };
+inline const size_t MAXIMUM_STORED_SHIFTS{ 10 };
 
 /// @brief The unit the staff member is assigned to. Use GENERAL for a non-specific unit.
 enum Unit
@@ -28,6 +28,12 @@ enum Unit
     PSYCH,
     ONCOLOGY,
     PALLIATIVE
+};
+
+enum Gender {
+    Male = 0,
+    Female,
+    Other
 };
 
 /// @brief The time designation of a shift. Uses two time_t data members for a start and end time.
@@ -65,6 +71,7 @@ class PatientProfile final : public Profile
 private:
     std::string m_first_name;           // The first name of the person on profile.
     std::string m_last_name;            // The last name of the person on profile.
+	Gender m_gender;
     time_t m_dob;                       // The age of the person on profile.
     time_t m_creation_date;             // The data the profile was created. This is assigned automatically, unless specified at the end of the constructor.
     std::string m_profile_number;            // The internal profile number. This is not created automatically, and must be manually assigned during construction.
@@ -75,13 +82,13 @@ private:
 
 public:
     // Creating a new patient profile
-    PatientProfile(std::string profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = 0, std::string reason_of_admission = "<unknown>", time_t time_of_admission = 0, time_t expected_time_of_stay = 0, Unit admitted_unit = GENERAL) :
-        m_profile_number{ profile_number }, m_first_name{ first_name }, m_last_name{ last_name }, m_dob{ dob }, m_reason_of_admission{ reason_of_admission }, m_time_of_admission{ time_of_admission }, m_expected_time_of_stay{ expected_time_of_stay }, m_creation_date{ time_t(0) }, m_admitted_unit{ admitted_unit } {
+    PatientProfile(std::string profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = 0, std::string reason_of_admission = "<unknown>", time_t time_of_admission = 0, time_t expected_time_of_stay = 0, Unit admitted_unit = GENERAL, Gender gender = Male) :
+        m_profile_number{ profile_number }, m_first_name{ first_name }, m_last_name{ last_name }, m_dob{ dob }, m_reason_of_admission{ reason_of_admission }, m_time_of_admission{ time_of_admission }, m_expected_time_of_stay{ expected_time_of_stay }, m_creation_date{ time_t(0) }, m_admitted_unit{ admitted_unit }, m_gender{gender} {
     }
 
     // Creating a patient profile from a pre-existing patient profile
-    PatientProfile(std::string profile_number, std::string first_name, std::string last_name, time_t dob, std::string reason_of_admission, time_t time_of_admission, time_t expected_time_of_stay, time_t creation_date, Unit admitted_unit) :
-        m_profile_number{ profile_number }, m_first_name{ first_name }, m_last_name{ last_name }, m_dob{ dob }, m_reason_of_admission{ reason_of_admission }, m_time_of_admission{ time_of_admission }, m_expected_time_of_stay{ expected_time_of_stay }, m_creation_date{ creation_date }, m_admitted_unit{ admitted_unit } {
+    PatientProfile(std::string profile_number, std::string first_name, std::string last_name, time_t dob, std::string reason_of_admission, time_t time_of_admission, time_t expected_time_of_stay, time_t creation_date, Unit admitted_unit, Gender gender) :
+        m_profile_number{ profile_number }, m_first_name{ first_name }, m_last_name{ last_name }, m_dob {dob}, m_reason_of_admission{ reason_of_admission }, m_time_of_admission{ time_of_admission }, m_expected_time_of_stay{ expected_time_of_stay }, m_creation_date{ creation_date }, m_admitted_unit{ admitted_unit }, m_gender{ gender } {
     }
 
     std::string getFirstName() const override { return m_first_name; }
@@ -89,6 +96,10 @@ public:
 
     std::string getLastName() const override { return m_last_name; }
     void setLastName(std::string last_name) override { m_last_name = last_name; }
+
+    Gender getGender() const  { return m_gender; }
+    void setGender(Gender gender) { m_gender = gender; };
+
 
     time_t getDOB() const override { return m_dob; }
     void setDOB(time_t dob) override { m_dob = dob; }
@@ -105,6 +116,9 @@ public:
 
     time_t getExpectedTimeOfStay() const { return m_expected_time_of_stay; }
     void setExpectedTimeOfStay(time_t expected_time_of_stay) { m_expected_time_of_stay = expected_time_of_stay; }
+
+    Unit getAssignedUnit() const { return m_admitted_unit; }
+    void setAssignedUnit(Unit assigned_unit) { m_admitted_unit = assigned_unit; }
 
     std::string toString() const override { return std::format("{} {} {} {} {} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_dob, m_creation_date, m_reason_of_admission, m_time_of_admission, m_expected_time_of_stay, size_t(m_admitted_unit)); }
     std::string toFormattedString() const override
