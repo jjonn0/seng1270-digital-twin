@@ -9,8 +9,8 @@
 
 #include "profiles.h"
 #include "simulation.h"
-#include "filehandler.h"
-#include "encdec.h"
+//#include "filehandler.h"
+//#include "encdec.h"
 
 using namespace std;
 
@@ -29,7 +29,7 @@ int main()
 	s0.setLastName("Billy-Bob");
 	s0.setOccupation("Doctor");
 	// Setting time-sensitive properties
-	time_t current_time; // Creates a new time_t object with the current time
+	time_t current_time = time_t(); // Creates a new time_t object with the current time
 	// getTimestamp comes from simulation.h
 	time_t january_first{getTimestamp(2026, 1, 1)}; // Creates a new time_t object with given year/month/day
 	time_t staff_birth_date{getTimestamp(1990, 7, 12)};
@@ -49,7 +49,7 @@ int main()
 	s0.setAssignedRooms(vector<string>{"206", "207", "208"});
 
 	// Printing the results!
-	cout << s0.toFormattedString() << endl;
+	cout << s0.toString() << endl;
 
 
 	/***************************************************************************************************************************************************************/
@@ -66,7 +66,42 @@ int main()
 
 	// Estimating wage cost for s0, remember that the wage is 72.00 an hour
 	cout << format("For s0's first shift, the wage cost is: {}", getCostEstimation(s0.getWage(), shift_one.getTotalTime(), HOUR));
-	
+
+	cout << endl << endl;
+
+	// Creating a room
+	Room r0{"200"};
+
+	// Can set occupancy/patients/staff through constructor or seperately.
+	r0.setMaxOccupancy(10);
+	r0.setPatients(vector<PatientProfile>{p0, p1});
+	r0.setStaff(vector<StaffProfile>{s0});
+
+	// Current patients
+	for (PatientProfile p : r0.getPatients())
+	{
+		cout << p.toString() << endl;
+	}
+
+	// Creating a new room to move a patient into.
+	Room r1{"201"};
+
+	// Move the patient to the new room.
+	r0.movePatient(p0, r1);
+
+	// Here is displayed that the patient was removed from r0 and moved into r1.
+	cout << "Room 200\n";
+	for (PatientProfile p : r0.getPatients())
+	{
+		cout << p.toString() << endl;
+	}
+	cout << "Room 201\n";
+	for (PatientProfile p : r1.getPatients())
+	{
+		cout << p.toString() << endl;
+	}
+
+	cout << r0.getOccupancyStatus();
 
 	/***************************************************************************************************************************************************************/
 
@@ -77,14 +112,14 @@ int main()
 	//FileHandler::savePatientData(p1, "examplepatients.csv", "SuperAwesomeMatrix");
 	//FileHandler::saveStaffData(s0, "examplestaff.csv", "SuperAwesomeMatrix");
 
-	vector<PatientProfile> patients{FileHandler::loadPatientData("examplepatients.csv", "SuperAwesomeMatrix")};
-	vector<StaffProfile> staff{FileHandler::loadStaffData("examplestaff.csv", "SuperAwesomeMatrix")};
+	//vector<PatientProfile> patients{FileHandler::loadPatientData("examplepatients.csv", "SuperAwesomeMatrix")};
+	//vector<StaffProfile> staff{FileHandler::loadStaffData("examplestaff.csv", "SuperAwesomeMatrix")};
 
-	cout << endl << endl;
-	for(PatientProfile p : patients)
-	{
-		cout << p.toString() << endl;
-	}
+	//cout << endl << endl;
+	//for(PatientProfile p : patients)
+	//{
+	//	cout << p.toString() << endl;
+	//}
 
 	return 0;
 }

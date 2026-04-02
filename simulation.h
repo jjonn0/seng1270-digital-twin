@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <algorithm>
+#include <typeinfo>
 #include "profiles.h"
 
 enum PatientStatus
@@ -106,3 +108,105 @@ std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> getUpcomingShifts(StaffProfile staf
 
     return upcoming_shifts;
 }
+
+class Room
+{
+    private:
+    const std::string m_room_number;
+    size_t m_max_occupancy;
+    std::vector<PatientProfile> m_patients;
+    std::vector<StaffProfile> m_staff;
+
+    template<typename T>
+    bool doesProfileExist(const T& profile)
+    {
+        size_t profile_number = profile.getProfileNumber();
+        if (typeid(T) == typeid(StaffProfile))
+        {
+            for (StaffProfile s : m_staff)
+            {
+                if (s.getProfileNumber() == profile_number) { return true; }
+            }
+        }
+        else if (typeid(T) == typeid(PatientProfile))
+        {
+            for (PatientProfile p : m_patients)
+            {
+                if (p.getProfileNumber() == profile_number) { return true; }
+            }
+        }
+        return false;
+    }
+
+    template<typename T>
+    void addProfileToVector(T profile, std::vector<T>& vector)
+    {
+        if(doesProfileExist(profile)) { std::cerr << std::format("Profile ID {} already exists.\n", profile.getProfileNumber()); }
+        else { vector.push_back(profile); }
+    }
+
+    template<typename T>
+    bool removeProfileFromVector(T profile, std::vector<T>& vector)
+    {
+        for (size_t profile_index{ 0 }; profile_index < vector.size(); profile_index++)
+        {
+            if (vector[profile_index].getProfileNumber() == profile.getProfileNumber())
+            {
+                vector.erase(vector.begin() + profile_index);
+                return true;
+            }
+        }
+        std::cerr << std::format("Profile ID {} was not found!\n", profile.getProfileNumber());
+        return false;
+    }
+
+    public:
+    Room(std::string room_number, size_t max_occupancy = 0, std::vector<PatientProfile> patients = {}, std::vector<StaffProfile> staff = {}) : m_room_number{room_number}, m_max_occupancy{max_occupancy}, m_patients{patients}, m_staff{staff} {}
+
+    void setMaxOccupancy(const size_t& max_occupancy) { m_max_occupancy = max_occupancy; }
+    size_t getMaxOccupancy() { return m_max_occupancy; }
+
+    void setPatients(const std::vector<PatientProfile> patients)
+    { 
+        for(const PatientProfile p : patients)
+        {
+            m_patients.push_back(p);
+        }
+    }
+    std::vector<PatientProfile> getPatients() { return m_patients; }
+
+    void setStaff(const std::vector<StaffProfile> staff)
+    { 
+        for (const StaffProfile s : staff)
+        {
+            m_staff.push_back(s);
+        }
+    }
+    std::vector<StaffProfile> getStaff() { return m_staff; }
+
+    void addPatientProfile(PatientProfile& profile) { addProfileToVector(profile, m_patients); }
+    void removePatientProfile(PatientProfile& profile) { removeProfileFromVector(profile, m_patients); }
+
+    void movePatient(PatientProfile& patient_to_move, Room& new_room)
+    {
+        if(removeProfileFromVector(patient_to_move, m_patients))
+        {
+            new_room.addPatientProfile(patient_to_move);
+        }
+    }
+
+    void addStaffProfile(const StaffProfile& profile) { addProfileToVector(profile, m_staff); }
+    void removeStaffProfile(StaffProfile& profile) { removeProfileFromVector(profile, m_staff); }
+
+    void moveStaff(StaffProfile& staff_to_move, Room& new_room)
+    {
+        if (removeProfileFromVector(staff_to_move, m_staff))
+        {
+            new_room.addStaffProfile(staff_to_move);
+        }
+    }
+
+    size_t getCurrentOccupancy() { return m_patients.size(); }
+    
+    std::string getOccupancyStatus() { return std::format("{}/{}", getCurrentOccupancy(), m_max_occupancy); }
+};

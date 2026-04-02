@@ -51,12 +51,12 @@ struct TimeBlock
 
 class Profile
 {
-    private:
+    protected:
     std::string m_first_name;                  // The first name of the person on profile.
     std::string m_last_name;                   // The last name of the person on profile.
     time_t m_dob;                              // The age of the person on profile.
     time_t m_creation_date;                    // The data the profile was created. This is assigned automatically, unless specified at the end of the constructor.
-    const size_t m_profile_number;             // The internal profile number. This is not created automatically, and must be manually assigned during construction.
+    size_t m_profile_number;                   // The internal profile number. This is not created automatically, and must be manually assigned during construction.
     Unit m_assigned_unit;                      // The unit that the profile is assigned to.
     std::vector<std::string> m_assigned_rooms; // The rooms that the profile is assigned to.
 
@@ -95,7 +95,7 @@ class Profile
     std::string toString() const { return std::format("{} {} {} {} {} {} {}", m_profile_number, m_first_name, m_last_name, m_dob, m_creation_date, int(m_assigned_unit), getRoomString()); };
 };
 
-class PatientProfile final : public Profile
+class PatientProfile final : public virtual Profile
 {
     private:
     
@@ -106,7 +106,7 @@ class PatientProfile final : public Profile
 
     public:
     // Creating a new patient profile
-        PatientProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = 0, std::string reason_of_admission = "<unknown>", time_t time_of_admission = 0, time_t expected_time_of_stay = 0, Unit admitted_unit = GENERAL, std::vector<std::string> assigned_rooms = {}) : 
+    PatientProfile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = 0, std::string reason_of_admission = "<unknown>", time_t time_of_admission = 0, time_t expected_time_of_stay = 0, Unit admitted_unit = GENERAL, std::vector<std::string> assigned_rooms = {}) : 
     Profile(profile_number, first_name, last_name, dob, admitted_unit, assigned_rooms), m_reason_of_admission{reason_of_admission}, m_time_of_admission{time_of_admission}, m_expected_time_of_stay{expected_time_of_stay} {}
 
     // Creating a patient profile from a pre-existing patient profile
@@ -127,7 +127,7 @@ class PatientProfile final : public Profile
     std::string toString() const { return std::format("{} {} {} {}", Profile::toString(), m_reason_of_admission, m_time_of_admission, m_expected_time_of_stay); }
 };
 
-class StaffProfile final : public Profile
+class StaffProfile final : public virtual Profile
 {
     private:
     std::string m_occupation;                                // The occupation the staff member belongs to.
