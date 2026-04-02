@@ -14,7 +14,7 @@ public:
 	MainFrame(const wxString& title);
 	std::vector<PatientProfile> m_patient;
 	std::vector<StaffProfile> m_staff;
-	void AdmitPatient(const std::string& f, const std::string& l, const std::string& r, time_t dob);
+	void AdmitPatient(const std::string& f, const std::string& l, const std::string& r, time_t dob, Unit u, Gender g);
 	void AdmitStaff(const std::string& f, const std::string& l, const std::string& j, time_t dob);
 	time_t getSimTime() {
 		return wxDateTime::Now().GetTicks() + m_timeDif;
@@ -37,4 +37,3 @@ private:
 
 	wxDECLARE_EVENT_TABLE();
 };
-
