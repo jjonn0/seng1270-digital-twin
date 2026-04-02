@@ -101,7 +101,27 @@ int main()
 		cout << p.toString() << endl;
 	}
 
-	cout << r0.getOccupancyStatus();
+	cout << r0.getOccupancyStatus() << std::endl;
+
+	p0.setAssignedRooms(vector<string>{"500", "501", "502"});
+	p1.setAssignedRooms(vector<string>{"500", "502", "503"});
+	s0.setAssignedRooms(vector<string>{"500", "502", "503", "504"});
+
+	vector<Room> rooms = generateRooms(vector<PatientProfile>{p0, p1}, vector<StaffProfile>{s0});
+
+	cout << "Rooms made: ";
+	for(Room room : rooms)
+	{
+		cout << room.getRoomNumber() << " ";
+	}
+	cout << endl;
+
+	vector<Room> unstaffed_rooms = getUnstaffedRooms(rooms);
+	cout << "Unstaffed rooms: ";
+	for (Room room : unstaffed_rooms)
+	{
+		cout << room.getRoomNumber() << " ";
+	}
 
 	/***************************************************************************************************************************************************************/
 
