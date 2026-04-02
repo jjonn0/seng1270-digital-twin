@@ -15,16 +15,15 @@ public:
 	void InitComps() {
 		//m_statPage = new wxSimplebook(this);
 
-		wxStaticText* Status = new wxStaticText(this, wxID_ANY, "Status Profiles");
 		homeBtn = new wxButton(this, wxID_ANY, "Home");
 		homeBtn->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { static_cast<wxSimplebook*>(this->GetParent())->SetSelection(0); });
 
-		m_displayInfo = new wxStaticText(this, wxID_ANY, "Laoding Patients");
+		m_displayInfo = new wxStaticText(this, wxID_ANY, "Loading Patients");
 		m_statSizer->Add(homeBtn, 0, wxALL | wxALIGN_CENTER, 5);
 		m_statSizer->Add(m_displayInfo, 1, wxEXPAND | wxALL, 5);
 
 
-		
+
 
 	}
 	void Styles() {
@@ -33,8 +32,8 @@ public:
 		this->SetSizer(m_statSizer);
 
 
-	}	
-	void UpdateDisplay(const std::vector<PatientProfile>&patient, time_t newTime) {
+	}
+	void UpdateDisplay(const std::vector<PatientProfile>& patient, time_t newTime) {
 		wxString m_patInfo = "";
 		for (const auto pat : patient) {
 			time_t addedTime = pat.getTimeOfAdmission();
@@ -52,7 +51,7 @@ public:
 			remTime = remTime % 60;
 			int seconds = remTime;
 
-			m_patInfo += wxString::Format("Patient: %s %s\nReason of Admission: %s\nTime of Admission: %s\nCurrent Time Stayed: Years: %d, Months: %d, Days: %d - %d : %d : %d\n\n", pat.getFirstName(), pat.getLastName(), pat.getReasonOfAdmission(), wxDateTime(pat.getTimeOfAdmission()).Format("%Y-%m-%d"), years, months, days, hours, minutes, seconds);
+			m_patInfo += wxString::Format("Patient: %s %s\nReason of Admission: %s\nTime of Admission: %s\nCurrent Time Stayed: Years: %d, Months: %d, Days: %d, %dhr : %dm : %ds\n\n", pat.getFirstName(), pat.getLastName(), pat.getReasonOfAdmission(), wxDateTime(pat.getTimeOfAdmission()).Format("%Y-%m-%d"), years, months, days, hours, minutes, seconds);
 
 		}
 		m_displayInfo->SetLabel(m_patInfo);
