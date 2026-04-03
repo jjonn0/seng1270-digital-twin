@@ -80,8 +80,24 @@ class Profile
     Unit getAssignedUnit() const { return m_assigned_unit; }
     void setAssignedUnit(Unit assigned_unit) { m_assigned_unit = assigned_unit; }
 
-    std::vector<std::string> getAssignedRooms() const { return m_assigned_rooms; }
+    std::vector<std::string>& getAssignedRooms() { return m_assigned_rooms; }
     void setAssignedRooms(std::vector<std::string> assigned_rooms) { m_assigned_rooms = assigned_rooms; }
+
+    void addAssignedRoom(std::string room_number)
+    {
+        if(find_if(m_assigned_rooms.begin(), m_assigned_rooms.end(), [&](std::string next_room_number){
+            return next_room_number == room_number;
+            }) == m_assigned_rooms.end())
+        {
+            m_assigned_rooms.push_back(room_number);
+        }
+    }
+    void removeAssignedRoom(std::string room_number)
+    {
+        m_assigned_rooms.erase(find_if(m_assigned_rooms.begin(), m_assigned_rooms.end(), [&](std::string next_room_number){
+            return next_room_number == room_number;
+            }));
+    }
 
     std::string getRoomString() const
     {
@@ -98,11 +114,9 @@ class Profile
 class PatientProfile final : public virtual Profile
 {
     private:
-    
     std::string m_reason_of_admission;  // The reason the patient is admitted to the hospital.
     time_t m_time_of_admission;         // The time at which the patient was processed.
     time_t m_expected_time_of_stay;     // The time at which the patient is expected to have been discharged.
-    
 
     public:
     // Creating a new patient profile

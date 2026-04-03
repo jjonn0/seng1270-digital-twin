@@ -74,13 +74,20 @@ int main()
 
 	// Can set occupancy/patients/staff through constructor or seperately.
 	r0.setMaxOccupancy(10);
-	r0.setPatients(vector<PatientProfile>{p0, p1});
+	vector<PatientProfile> r0_patients{ p0, p1 };
+	r0.setPatients(r0_patients);
 	r0.setStaff(vector<StaffProfile>{s0});
 
-	// Current patients
+	// Current patients and their assigned rooms
 	for (PatientProfile p : r0.getPatients())
 	{
 		cout << p.toString() << endl;
+		cout << "Patient is assigned to room: " << p.getAssignedRooms().size();
+		for(std::string room_number : p.getAssignedRooms())
+		{
+			cout << room_number << " ";
+		}
+		cout << endl;
 	}
 
 	// Creating a new room to move a patient into.
@@ -94,20 +101,37 @@ int main()
 	for (PatientProfile p : r0.getPatients())
 	{
 		cout << p.toString() << endl;
+		cout << "Patient is assigned to room: ";
+		for (std::string room_number : p.getAssignedRooms())
+		{
+			cout << room_number << " ";
+		}
+		cout << endl;
 	}
 	cout << "Room 201\n";
 	for (PatientProfile p : r1.getPatients())
 	{
 		cout << p.toString() << endl;
+		cout << "Patient is assigned to room: ";
+		for (std::string room_number : p.getAssignedRooms())
+		{
+			cout << room_number << " ";
+		}
+		cout << endl;
 	}
 
+	// Display occupancy status of room
 	cout << r0.getOccupancyStatus() << std::endl;
 
+	// We can also set the rooms we want a profile to have
 	p0.setAssignedRooms(vector<string>{"500", "501", "502"});
 	p1.setAssignedRooms(vector<string>{"500", "502", "503"});
 	s0.setAssignedRooms(vector<string>{"500", "502", "503", "504"});
 
-	vector<Room> rooms = generateRooms(vector<PatientProfile>{p0, p1}, vector<StaffProfile>{s0});
+	// And create rooms based off of that!
+	vector<PatientProfile> patients{p0, p1};
+	vector<StaffProfile> staff{s0};
+	vector<Room> rooms = generateRooms(patients, staff);
 
 	cout << "Rooms made: ";
 	for(Room room : rooms)
@@ -116,8 +140,30 @@ int main()
 	}
 	cout << endl;
 
+	// Displaying rooms with patients but no staff
 	vector<Room> unstaffed_rooms = getUnstaffedRooms(rooms);
 	cout << "Unstaffed rooms: ";
+	for (Room room : unstaffed_rooms)
+	{
+		cout << room.getRoomNumber() << " ";
+	}
+	cout << endl;
+
+	// Adding a staff member to all unstaffed rooms:
+	for(Room& unstaffed_room : unstaffed_rooms)
+	{
+		for(Room& room : rooms)
+		{
+			if(unstaffed_room.getRoomNumber() == room.getRoomNumber())
+			{
+				room.addStaffProfile(staff[0]);
+			}
+		}
+	}
+
+	// Checking for unstaffed rooms
+	unstaffed_rooms = getUnstaffedRooms(rooms);
+	cout << "Unstaffed rooms (again): ";
 	for (Room room : unstaffed_rooms)
 	{
 		cout << room.getRoomNumber() << " ";
