@@ -61,7 +61,7 @@ class Profile
     std::vector<std::string> m_assigned_rooms; // The rooms that the profile is assigned to.
 
     public:
-        Profile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = time_t(), Unit assigned_unit = Unit::GENERAL, std::vector<std::string> assigned_rooms = {}, time_t creation_date = time_t()) : 
+        Profile(size_t profile_number, std::string first_name = "<unknown>", std::string last_name = "<unknown>", time_t dob = time_t(), Unit assigned_unit = Unit::GENERAL, std::vector<std::string> assigned_rooms = {}, time_t creation_date = time(nullptr)) :  
             m_profile_number{profile_number}, m_first_name{first_name}, m_last_name{last_name}, m_dob{dob}, m_assigned_unit{assigned_unit}, m_assigned_rooms{assigned_rooms}, m_creation_date{creation_date} {}
 
     std::string getFirstName() const { return m_first_name; }
@@ -153,7 +153,7 @@ class StaffProfile final : public virtual Profile
     Profile(profile_number, first_name, last_name, dob, asssigned_unit, assigned_rooms), m_occupation{occupation}, m_wage{wage}, m_shifts{shifts} {}
 
     StaffProfile(size_t profile_number, std::string first_name, std::string last_name, time_t dob, std::string occupation, size_t wage, time_t creation_date, std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts, Unit asssigned_unit, std::vector<std::string> assigned_rooms) :
-        Profile(profile_number, first_name, last_name, dob, asssigned_unit, assigned_rooms, creation_date), m_occupation{occupation}, m_wage{wage}, m_shifts{shifts} {}
+    Profile(profile_number, first_name, last_name, dob, asssigned_unit, assigned_rooms, creation_date), m_occupation{occupation}, m_wage{wage}, m_shifts{shifts} {}
 
     std::string getOccupation() const { return m_occupation; }
     void setOccupation(std::string occupation) { m_occupation = occupation; }

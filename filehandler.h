@@ -48,26 +48,42 @@ class FileHandler
         EncDec encdec;
 
         for (size_t i{0}; i < file.GetRowCount(); i++) {
-            std::string d_profile_number{encdec.decrypt(password, file.GetCell<std::string>(columns.c_profile_number, i))};
-            std::string d_first_name{encdec.decrypt(password, file.GetCell<std::string>(columns.c_first_name, i))};
-            std::string d_last_name{encdec.decrypt(password, file.GetCell<std::string>(columns.c_last_name, i))};
-            std::string d_dob{encdec.decrypt(password, file.GetCell<std::string>(columns.c_dob, i))};
-            std::string d_reason_of_admission{encdec.decrypt(password, file.GetCell<std::string>(columns.c_time_of_admission, i))};
-            std::string d_time_of_admission{encdec.decrypt(password, file.GetCell<std::string>(columns.c_dob, i))};
-            std::string d_expected_time_of_stay{encdec.decrypt(password, file.GetCell<std::string>(columns.c_expected_time_of_stay, i))};
-            std::string d_creation_date{encdec.decrypt(password, file.GetCell<std::string>(columns.c_creation_date, i))};
-            std::string d_assigned_unit{encdec.decrypt(password, file.GetCell<std::string>(columns.c_admitted_unit, i))};
+            std::string read_profile_number{ file.GetCell<std::string>(columns.c_profile_number, i) };
+            std::string read_first_name{ file.GetCell<std::string>(columns.c_first_name, i) };
+            std::string read_last_name{ file.GetCell<std::string>(columns.c_last_name, i) };
+            std::string read_dob{ file.GetCell<std::string>(columns.c_dob, i) };
+            std::string read_reason_of_admission{ file.GetCell<std::string>(columns.c_reason_of_admission, i) };
+            std::string read_time_of_admission{ file.GetCell<std::string>(columns.c_time_of_admission, i) };
+            std::string read_expected_time_of_stay{ file.GetCell<std::string>(columns.c_expected_time_of_stay, i) };
+            std::string read_creation_date{ file.GetCell<std::string>(columns.c_creation_date, i) };
+            std::string read_admitted_unit{ file.GetCell<std::string>(columns.c_admitted_unit, i) };
+            std::string read_assigned_rooms{ file.GetCell<std::string>(columns.c_assigned_rooms, i) };
 
-            size_t profile_number = std::stoull(d_profile_number);
-            std::string first_name = d_first_name;
-            std::string last_name = d_last_name;
-            time_t dob = std::stoull(d_dob);
-            std::string reason_of_admission = d_reason_of_admission;
-            time_t time_of_admission = stoull(d_time_of_admission);
-            time_t expected_time_of_stay = stoull(d_expected_time_of_stay);
-            time_t creation_date = stoull(d_creation_date);
-            Unit assigned_unit = static_cast<Unit>(stoi(d_assigned_unit));
-            profiles.emplace_back(profile_number, first_name, last_name, dob, reason_of_admission, time_of_admission, expected_time_of_stay, creation_date, assigned_unit); // creates a new object for each row, and sticks it in a vector
+            if (password != "")
+            {
+                read_profile_number = encdec.decrypt(password, read_profile_number);
+                read_first_name = encdec.decrypt(password, read_first_name);
+                read_last_name = encdec.decrypt(password, read_last_name);
+                read_dob = encdec.decrypt(password, read_dob);
+                read_reason_of_admission = encdec.decrypt(password, read_reason_of_admission);
+                read_time_of_admission = encdec.decrypt(password, read_time_of_admission);
+                read_expected_time_of_stay = encdec.decrypt(password, read_expected_time_of_stay);
+                read_creation_date = encdec.decrypt(password, read_creation_date);
+                read_admitted_unit = encdec.decrypt(password, read_admitted_unit);
+                read_assigned_rooms = encdec.decrypt(password, read_assigned_rooms);
+            }
+
+            size_t profile_number = std::stoull(read_profile_number);
+            std::string first_name = read_first_name;
+            std::string last_name = read_last_name;
+            time_t dob = std::stoull(read_dob);
+            std::string reason_of_admission = read_reason_of_admission;
+            time_t time_of_admission = stoull(read_time_of_admission);
+            time_t expected_time_of_stay = stoull(read_expected_time_of_stay);
+            time_t creation_date = stoull(read_creation_date);
+            Unit assigned_unit = static_cast<Unit>(stoi(read_admitted_unit));
+            std::vector<std::string> assigned_rooms = parseIntoRooms(read_assigned_rooms);
+            profiles.emplace_back(profile_number, first_name, last_name, dob, reason_of_admission, time_of_admission, expected_time_of_stay, creation_date, assigned_unit, assigned_rooms); // creates a new object for each row, and sticks it in a vector
         }
         return profiles;
     }
@@ -114,34 +130,48 @@ class FileHandler
         std::vector<StaffProfile> profiles;
 
         for (size_t i{0}; i < file.GetRowCount(); i++) {
-            std::string d_profile_number{ encdec.decrypt(password, file.GetCell<std::string>(columns.c_profile_number, i)) };
-            std::string d_first_name{ encdec.decrypt(password, file.GetCell<std::string>(columns.c_first_name, i)) };
-            std::string d_last_name{ encdec.decrypt(password, file.GetCell<std::string>(columns.c_last_name, i)) };
-            std::string d_dob{ encdec.decrypt(password, file.GetCell<std::string>(columns.c_dob, i)) };
-            std::string d_occupation{ encdec.decrypt(password, file.GetCell<std::string>(columns.c_occupation, i)) };
-            std::string d_wage{ encdec.decrypt(password, file.GetCell<std::string>(columns.c_shifts, i)) };
-            std::string d_shifts{ encdec.decrypt(password, file.GetCell<std::string>(columns.c_shifts, i)) };
-            std::string d_assigned_unit{ encdec.decrypt(password, file.GetCell<std::string>(columns.c_assigned_unit, i)) };
-            std::string d_assigned_rooms{ encdec.decrypt(password, file.GetCell<std::string>(columns.c_assigned_rooms, i)) };
-            std::string d_creation_date{ encdec.decrypt(password, file.GetCell<std::string>(columns.c_creation_date, i)) };
+            std::string read_profile_number{file.GetCell<std::string>(columns.c_profile_number, i)};
+            std::string read_first_name{file.GetCell<std::string>(columns.c_first_name, i)};
+            std::string read_last_name{file.GetCell<std::string>(columns.c_last_name, i)};
+            std::string read_dob{file.GetCell<std::string>(columns.c_dob, i)};
+            std::string read_occupation{file.GetCell<std::string>(columns.c_occupation, i)};
+            std::string read_wage{file.GetCell<std::string>(columns.c_shifts, i)};
+            std::string read_shifts{file.GetCell<std::string>(columns.c_shifts, i)};
+            std::string read_assigned_unit{file.GetCell<std::string>(columns.c_assigned_unit, i)};
+            std::string read_assigned_rooms{file.GetCell<std::string>(columns.c_assigned_rooms, i)};
+            std::string read_creation_date{file.GetCell<std::string>(columns.c_creation_date, i)};
 
-            size_t profile_number = stoull(d_profile_number);
-            std::string first_name = d_first_name;
-            std::string last_name = d_last_name;
-            time_t dob = stoull(d_dob);
-            std::string occupation = d_occupation;
-            size_t wage = stoull(d_wage);
-            std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts = parseIntoTimeBlocks(d_shifts);
-            Unit assigned_unit = static_cast<Unit>(stoi(d_assigned_unit));
-            std::vector<std::string> assigned_rooms = parseIntoRooms(d_assigned_rooms);
-            time_t creation_date = stoull(d_creation_date);
+            if(password != "")
+            {
+                read_profile_number = encdec.decrypt(password, read_profile_number);
+                read_first_name = encdec.decrypt(password, read_first_name);
+                read_last_name = encdec.decrypt(password, read_last_name);
+                read_dob = encdec.decrypt(password, read_dob);
+                read_occupation = encdec.decrypt(password, read_occupation);
+                read_wage = encdec.decrypt(password, read_wage);
+                read_shifts = encdec.decrypt(password, read_shifts);
+                read_assigned_unit = encdec.decrypt(password, read_assigned_unit);
+                read_assigned_rooms = encdec.decrypt(password, read_assigned_rooms);
+                read_creation_date = encdec.decrypt(password, read_creation_date);
+            }
+
+            size_t profile_number = stoull(read_profile_number);
+            std::string first_name = read_first_name;
+            std::string last_name = read_last_name;
+            time_t dob = stoull(read_dob);
+            std::string occupation = read_occupation;
+            size_t wage = stoull(read_wage);
+            std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> shifts = parseIntoTimeBlocks(read_shifts);
+            Unit assigned_unit = static_cast<Unit>(stoi(read_assigned_unit));
+            std::vector<std::string> assigned_rooms = parseIntoRooms(read_assigned_rooms);
+            time_t creation_date = stoull(read_creation_date);
             profiles.emplace_back(profile_number, first_name, last_name, dob, occupation, wage, creation_date, shifts, assigned_unit, assigned_rooms);
         }
         return profiles;
     }
 
     /// @brief dont use this function, use savePatientData for a single patient, and saveAllPatientData for a vector of patient data 
-    static void writePatientData(PatientProfile patient, std::string filename, size_t row, std::string password, EncDec encdec, rapidcsv::Document file) {
+    static void writePatientData(PatientProfile patient, std::string filename, size_t row, std::string password, EncDec encdec, rapidcsv::Document& file) {
         std::string profile_number{std::to_string(patient.getProfileNumber())};
         std::string first_name{patient.getFirstName()};
         std::string last_name{patient.getLastName()};
@@ -151,6 +181,7 @@ class FileHandler
         std::string expected_stay_time{std::to_string(patient.getExpectedTimeOfStay())};
         std::string creation_date{std::to_string(patient.getCreationDate())};
         std::string admitted_unit{std::to_string(patient.getAdmittedUnitInt())};
+        std::string assigned_rooms{patient.getRoomString()};
 
         // If a password is entered, encrypt the output
         if(password != "")
@@ -164,6 +195,7 @@ class FileHandler
             expected_stay_time = encdec.encrypt(password, expected_stay_time);
             creation_date = encdec.encrypt(password, creation_date);
             admitted_unit = encdec.encrypt(password, admitted_unit);
+            assigned_rooms = encdec.encrypt(password, assigned_rooms);
         }
 
         file.SetCell(0, row, profile_number);
@@ -175,11 +207,12 @@ class FileHandler
         file.SetCell(6, row, expected_stay_time);
         file.SetCell(7, row, creation_date);
         file.SetCell(8, row, admitted_unit);
-        file.Save(filename);
+        file.SetCell(9, row, assigned_rooms);
+        //file.Save();
     }
 
     /// @brief dont use this function, use saveStaffData for a single staff member, and saveAllStaffData for a vector of patient data 
-    static void writeStaffData(StaffProfile staff, std::string filename, rapidcsv::Document file, size_t row, std::string password, EncDec encdec) {
+    static void writeStaffData(StaffProfile staff, std::string filename, rapidcsv::Document& file, size_t row, std::string password, EncDec& encdec) {
         std::string profile_number{ std::to_string(staff.getProfileNumber())};
         std::string first_name{staff.getFirstName()};
         std::string last_name{staff.getLastName()};
@@ -264,24 +297,27 @@ class FileHandler
     /// @brief Saves all of the patient data from a vector to a file.
     /// @param pProfiles A vector of patientProfiles
     /// @param filename The file to save the data to
-    /// @param encdec An encdec? I don't know what this is...ask Jonathon I guess
     /// @param password The encryption password
-    static void saveAllPatientData(std::vector<PatientProfile> pProfiles, std::string filename, EncDec encdec, std::string password) {
+    static void saveAllPatientData(std::vector<PatientProfile> pProfiles, std::string filename, std::string password) {
         rapidcsv::Document file(filename);
+        EncDec encdec;
         for(size_t i{0}; i < pProfiles.size(); i++) {
             writePatientData(pProfiles[i], filename, i, password, encdec, file);
+            file.Save();
         }
+        
     }
 
     /// @brief Saves all of the staff data from a vector to a file.
     /// @param sProfiles A vector of staffProfiles
     /// @param filename The file to save the data to
-    /// @param encdec An encdec? I don't know what this is...ask Jonathon I guess
     /// @param password The encryption password
-    static void saveAllStaffData(std::vector<StaffProfile> sProfiles, std::string filename, EncDec encdec, std::string password) {
+    static void saveAllStaffData(std::vector<StaffProfile> sProfiles, std::string filename, std::string password) {
         rapidcsv::Document file(filename);
+        EncDec encdec;
         for (size_t i{0}; i < sProfiles.size(); i++) {
             writeStaffData(sProfiles[i], filename, file, i, password, encdec);
+            file.Save();
         }
     }
 

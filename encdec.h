@@ -126,7 +126,7 @@ class EncDec
 			int char_value{ 0 };
 			do
 			{
-				char_value += bits[byte_index * BYTE_SIZE + bit_index] * pow(2, bit_index);
+				char_value += bits[byte_index * BYTE_SIZE + bit_index] * int(pow(2, bit_index));
 				bit_index++;
 			} while (bit_index % BYTE_SIZE != 0);
 			string_out += char(char_value);
