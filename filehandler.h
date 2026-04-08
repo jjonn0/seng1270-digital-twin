@@ -102,8 +102,8 @@ class FileHandler
             single_section << processed_data;
             if (!getline(single_section, start_string, '\\')) break;
             if (!getline(single_section, end_string, '\\')) break;
-            start = static_cast<time_t>(stoi(start_string));
-            end = static_cast<time_t>(stoi(end_string));
+            start = static_cast<time_t>(stoull(start_string));
+            end = static_cast<time_t>(stoull(end_string));
             result[array_index].time_block_start = start;
             result[array_index].time_block_end = end; 
         }

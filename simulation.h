@@ -84,7 +84,7 @@ class Room
     std::string getRoomNumber() { return m_room_number; }
 
     void setMaxOccupancy(const size_t& max_occupancy) { m_max_occupancy = max_occupancy; }
-    size_t getMaxOccupancy() { return m_max_occupancy; }
+    size_t getMaxOccupancy() const { return m_max_occupancy; }
 
     void setPatients(std::vector<PatientProfile>& patients)
     {
