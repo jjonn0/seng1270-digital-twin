@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <fstream>
+#include <filesystem>
 #include "rapidcsv.h"
 #include "profiles.h"
 #include "encdec.h"
@@ -319,6 +319,74 @@ class FileHandler
             writeStaffData(sProfiles[i], filename, file, i, password, encdec);
             file.Save();
         }
+    }
+
+    static bool doesFileExist(std::string file_name)
+    {
+        std::filesystem::path path{file_name};
+        return std::filesystem::exists(path);
+    }
+
+    /// @note    You do not need to add .csv
+    static bool createNewCSV(std::string file_name)
+    {
+        file_name += ".csv";
+        if(doesFileExist(file_name))
+        {
+            pushError("File already exists.\n");
+            return false;
+        }
+        else
+        {
+            std::ofstream ofstream{file_name};
+            return true;
+        }
+    }
+
+    /// @note    You do not need to add .csv
+    static bool createNewPatientCSV(std::string file_name)
+    {
+        if(createNewCSV(file_name))
+        {
+            file_name += ".csv";
+            rapidcsv::Document file(file_name);
+            file.SetColumnName(0, columns.c_profile_number);
+            file.SetColumnName(1, columns.c_first_name);
+            file.SetColumnName(2, columns.c_last_name);
+            file.SetColumnName(3, columns.c_dob);
+            file.SetColumnName(4, columns.c_reason_of_admission);
+            file.SetColumnName(5, columns.c_time_of_admission);
+            file.SetColumnName(6, columns.c_expected_time_of_stay);
+            file.SetColumnName(7, columns.c_creation_date);
+            file.SetColumnName(8, columns.c_admitted_unit);
+            file.SetColumnName(9, columns.c_assigned_rooms);
+            file.Save();
+            return true;
+        }
+        return false;
+    }
+
+    /// @note   You do not need to add .csv
+    static bool createNewStaffCSV(std::string file_name)
+    {
+        if(createNewCSV(file_name))
+        {
+            file_name += ".csv";
+            rapidcsv::Document file(file_name);
+            file.SetColumnName(0, columns.c_profile_number);
+            file.SetColumnName(1, columns.c_first_name);
+            file.SetColumnName(2, columns.c_last_name);
+            file.SetColumnName(3, columns.c_dob);
+            file.SetColumnName(4, columns.c_occupation);
+            file.SetColumnName(5, columns.c_wage);
+            file.SetColumnName(6, columns.c_shifts);
+            file.SetColumnName(7, columns.c_assigned_unit);
+            file.SetColumnName(8, columns.c_assigned_rooms);
+            file.SetColumnName(9, columns.c_creation_date);
+            file.Save();
+            return true;
+        }
+        return false;
     }
 
     //========================================================================================================================================================================
