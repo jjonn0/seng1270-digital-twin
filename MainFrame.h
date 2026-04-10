@@ -11,7 +11,7 @@
 class MainFrame : public wxFrame
 {
 public:
-	MainFrame(const wxString& title);
+	MainFrame(const wxString& title, const std::string& sessionPassword);
 	std::vector<PatientProfile> m_patient;
 	std::vector<StaffProfile> m_staff;
 	void AdmitPatient(const std::string& f, const std::string& l, const std::string& r, time_t dob, Unit u, Gender g);
@@ -33,6 +33,7 @@ private:
 	PatientProfile* m_currentPatient;
 	StaffProfile* m_currentStaff;
 	void OnTimer(wxTimerEvent& evt);
+	std::string m_currentPassword;
 
 
 	wxDECLARE_EVENT_TABLE();
