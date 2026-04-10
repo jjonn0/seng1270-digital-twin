@@ -3,6 +3,7 @@
 #include "StatusPage.h"
 #include "simulation.h"
 #include "profiles.h"
+#include "filehandler.h"
 #include <wx/notebook.h>
 #include <wx/simplebook.h>
 #include <format>
@@ -11,27 +12,33 @@
 #include<wx/wx.h>
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
-EVT_TIMER(wxID_ANY, MainFrame::OnTimer)
+	EVT_TIMER(wxID_ANY, MainFrame::OnTimer)
 wxEND_EVENT_TABLE();
 
 
-MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) {
+
+MainFrame::MainFrame(const wxString& title, const std::string& currentPassword) : wxFrame(nullptr, wxID_ANY, title), m_currentPassword(currentPassword) {
+	m_patient.clear();
+	m_staff.clear();
+
+	try {
+		m_patient = FileHandler::loadPatientData("patients.csv", currentPassword);
+		m_staff = FileHandler::loadStaffData("staff.csv", currentPassword);
+
+	}
+	catch (const std::exception& e) {
+		wxLogDebug("Error loading data: %s", e.what());
+	}
+	wxMessageBox(wxString::Format("Startup Check: Loaded %zu patients from CSV!", m_patient.size()));
 	m_timer.Start(1000);
 	wxSimplebook* pageContainer = new wxSimplebook(this, wxID_ANY);
 	page1 = new wxPanel(pageContainer);
 	page2 = new PatientPage(pageContainer, this);
 	page3 = new StatusPage(pageContainer);
-
-	m_patient.push_back(PatientProfile("01P", "Jim", "Davis", getTimestamp(2007, 5, 13), "Ate Too Much Lasanga", getTimestamp(2023, 5, 15), 0, GENERAL, Male));
-	m_patient.push_back(PatientProfile("02P", "Jerry", "Slime", getTimestamp(1997, 8, 29), "Died Probably idk", getTimestamp(2025, 8, 29), 0 , CARDIAC, Female));
-	m_patient.push_back(PatientProfile("03P", "Laurel", "Yanny", getTimestamp(2000, 7, 2), "Every word sounds the same to them.", getTimestamp(2020, 2, 28), 0, NEURO, Other));
-	m_staff.push_back(StaffProfile("01S", "Shaun", "Admin", getTimestamp(2025, 5, 13), "Head of Medicine", 5000));
-	m_staff.push_back(StaffProfile("02S", "Shaun", "Admin", getTimestamp(2025, 5, 13), "Head of Medicine", 5000));
-
-
+	
+	
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer* page1Sizer = new wxBoxSizer(wxVERTICAL);
-
 
 
 	page1->SetBackgroundColour(*wxLIGHT_GREY);
@@ -102,7 +109,7 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) 
 				page3->UpdateDisplay(m_patient, newTime);
 				pageContainer->SetSelection(0);
 			}
-
+			
 		}
 		else {
 			wxMessageBox("Please enter a valid date in the format: YYYY, MM, DD", "Invalid Date Format", wxOK | wxICON_ERROR);
@@ -112,6 +119,11 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) 
 	m_timer.SetOwner(this);
 
 	CreateStatusBar();
+	page2->UpdateDisplay(m_patient, m_staff, getSimTime());
+	page3->UpdateDisplay(m_patient, getSimTime());
+
+	this->Layout();
+	this->Refresh();
 
 }
 
@@ -133,11 +145,20 @@ void MainFrame::OnTimer(wxTimerEvent& evt) {
 }
 
 void MainFrame::AdmitPatient(const std::string& f, const std::string& l, const std::string& r, time_t dob, Unit u, Gender g) {
-	std::string IDP = std::format("{}P", m_patient.size() + 1);
-	m_patient.push_back(PatientProfile(
-		IDP, f, l, dob, r, wxDateTime::Now().GetTicks(), 0, u, g
-	));
+	size_t IDP = m_patient.size() + 1;
+	PatientProfile newPatient(IDP, f, l, dob, r, wxDateTime::Now().GetTicks(), 0, u, g);
+	m_patient.push_back(newPatient);
+	FileHandler::savePatientData(newPatient, "C:\\Users\\andno\\Desktop\\VitalVitals\\x64\\Debug\\patients.csv", m_currentPassword);
 	SetStatusText("Admitted: " + wxString(f) + " " + wxString(l));
+}
+
+void MainFrame::AdmitStaff(const std::string& f, const std::string& l, const std::string& j, time_t dob) {
+	size_t IDS = m_staff.size() + 1;
+	StaffProfile newStaff( IDS, f, l, dob, j, 5000, GENERAL, Other);
+	m_staff.push_back(newStaff);
+	FileHandler::saveStaffData(newStaff, "C:\\Users\\andno\\Desktop\\VitalVitals\\x64\\Debug\\staff.csv", m_currentPassword);
+	SetStatusText("Admitted: " + wxString(f) + " " + wxString(l));
+
 }
 
 void PatientPage::OnAdmit(wxCommandEvent& evt) {
@@ -188,14 +209,7 @@ void PatientPage::OnAdmit(wxCommandEvent& evt) {
 	}
 }
 
-void MainFrame::AdmitStaff(const std::string& f, const std::string& l, const std::string& j, time_t dob) {
-	std::string IDS = std::format("{}S", m_staff.size() + 1);
-	m_staff.push_back(StaffProfile(
-		IDS, f, l, dob, j, 5000
-	));
-	SetStatusText("Admitted: " + wxString(f) + " " + wxString(l));
 
-}
 
 void StaffPage::OnPress(wxCommandEvent& evt) {
 	wxDateTime now = wxDateTime::Now();
