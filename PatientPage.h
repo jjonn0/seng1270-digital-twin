@@ -26,7 +26,6 @@ public:
 		m_profSizer = new wxBoxSizer(wxVERTICAL);
 		m_scrollSizer = new wxBoxSizer(wxVERTICAL);
 
-
 		m_notebook1 = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 
 		m_patPage = new wxPanel(m_notebook1);
@@ -47,7 +46,6 @@ public:
 		m_unitLabel = new wxStaticText(m_patPage, wxID_ANY, "Select Unit:");
 		m_genderLabel = new wxStaticText(m_patPage, wxID_ANY, "Select Gender: ");
 
-
 		wxArrayString unitOptions;
 		unitOptions.Add("GENERAL");  unitOptions.Add("ER"); unitOptions.Add("ICU"); unitOptions.Add("CARDIAC"); unitOptions.Add("NEURO"); unitOptions.Add("POST_OP");
 		unitOptions.Add("GERIATRIC"); unitOptions.Add("TRAUMA"); unitOptions.Add("NEPHRO"); unitOptions.Add("PSHYC"); unitOptions.Add("ONCOLOGY"); unitOptions.Add("PALLIATIVE");
@@ -58,9 +56,8 @@ public:
 		m_genderChoice = new wxChoice(m_patPage, wxID_ANY, wxDefaultPosition, wxDefaultSize ,gendersOpt);
 		m_unitChoice->SetSelection(0);
 		m_genderChoice->SetSelection(0);
-
-
 	}
+
 	void Styles() {
 		m_labelSizer = new wxBoxSizer(wxHORIZONTAL);
 		m_choiceSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -111,6 +108,7 @@ public:
 
 	}
 	void UpdateDisplay(const std::vector<PatientProfile>& patient, const std::vector<StaffProfile>& staff, wxDateTime currenttime, wxString unit = "") {
+		//m_listControl->DeleteAllItems();
 		m_patientTot = "";
 		wxArrayString unitOptions;
 		m_staffPage->UpdateDisplay(staff, currenttime);
@@ -127,10 +125,13 @@ public:
 			Gender g = pat.getGender();
 			wxString unitName = m_unitChoice->GetString((int)u);
 			wxString genderName = m_genderChoice->GetString((int)g);
-			m_patientTot += wxString::Format("Patient: %s\nAge: %d\nReason %s\nID: %s\nUnit: %s\nGender: %s\n\n", fullName, age, reason, pat.getProfileNumber(),unitName, genderName);
+			m_patientTot += wxString::Format("Patient: %s\nAge: %d\nReason %s\nID: %llu\nUnit: %s\nGender: %s\n\n", fullName, age, reason, pat.getProfileNumber(),unitName, genderName);
+			m_patientLabel->SetLabel(m_patientTot);
+
+			//int row = m_listControl->InsertItem(m_listControl->GetItemCount(), m_patientTot);
+			//m_listcontrol->SetItem(row, 1, wxString::Format("%d", age));
 
 		}
-		m_patientLabel->SetLabel(m_patientTot);
 		int width = m_scrolledWindow1->GetClientSize().GetWidth();
 		if (width > 0) {
 			m_patientLabel->Wrap(width);
@@ -172,5 +173,4 @@ private:
 	wxButton* admitBtn;
 
 	MainFrame* m_frame1;
-
 };
