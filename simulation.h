@@ -1,12 +1,20 @@
 #pragma once
 #include <iostream>
+#include <array>
 #include <vector>
 #include <cmath>
+#include <algorithm>
+#include <typeinfo>
 #include "profiles.h"
+
+
+class PatientProfile;
+class StaffProfile;
 
 enum PatientStatus
 {
     DISCHARGED,
+    ADMITTED,
     NONE
 };
 
@@ -19,16 +27,145 @@ enum TimeUnit
     YEAR = WEEK * 52
 };
 
+class Room
+{
+private:
+    const std::string m_room_number;
+    size_t m_max_occupancy;
+    std::vector<PatientProfile> m_patients;
+    std::vector<StaffProfile> m_staff;
+
+    template<typename T>
+    bool doesProfileExist(const T& profile)
+    {
+        size_t profile_number = profile.getProfileNumber();
+        if (typeid(T) == typeid(StaffProfile))
+        {
+            for (StaffProfile s : m_staff)
+            {
+                if (s.getProfileNumber() == profile_number) { return true; }
+            }
+        }
+        else if (typeid(T) == typeid(PatientProfile))
+        {
+            for (PatientProfile p : m_patients)
+            {
+                if (p.getProfileNumber() == profile_number) { return true; }
+            }
+        }
+        return false;
+    }
+
+    template<typename T>
+    bool addProfileToVector(T& profile, std::vector<T>& vector)
+    {
+        if (doesProfileExist(profile)) { std::cerr << std::format("Profile ID {} already exists.\n", profile.getProfileNumber()); }
+        else
+        {
+            vector.push_back(profile);
+            return true;
+        }
+        return false;
+    }
+
+    template<typename T>
+    bool removeProfileFromVector(T& profile, std::vector<T>& vector)
+    {
+        for (size_t profile_index{ 0 }; profile_index < vector.size(); profile_index++)
+        {
+            if (vector[profile_index].getProfileNumber() == profile.getProfileNumber())
+            {
+                vector.erase(vector.begin() + profile_index);
+                return true;
+            }
+        }
+        std::cerr << std::format("Profile ID {} was not found!\n", profile.getProfileNumber());
+        return false;
+    }
+
+public:
+    Room(std::string room_number, size_t max_occupancy = 0, std::vector<PatientProfile> patients = {}, std::vector<StaffProfile> staff = {}) : m_room_number{ room_number }, m_max_occupancy{ max_occupancy }, m_patients{ patients }, m_staff{ staff } {}
+
+    std::string getRoomNumber() { return m_room_number; }
+
+    void setMaxOccupancy(const size_t& max_occupancy) { m_max_occupancy = max_occupancy; }
+    size_t getMaxOccupancy() const { return m_max_occupancy; }
+
+    void setPatients(std::vector<PatientProfile>& patients)
+    {
+        m_patients.clear();
+        for (PatientProfile& p : patients)
+        {
+            addPatientProfile(p);
+        }
+    }
+    std::vector<PatientProfile> getPatients() { return m_patients; }
+
+    void setStaff(std::vector<StaffProfile> staff)
+    {
+        m_staff.clear();
+        for (StaffProfile& s : staff)
+        {
+            addStaffProfile(s);
+        }
+    }
+    std::vector<StaffProfile> getStaff() { return m_staff; }
+
+    /// @brief  Takes in a profile and adds to the end of the patient vector.
+    /// @note   Will not add a duplicate profile. Prints a warning if a blocked duplicate were to occur.
+    void addPatientProfile(PatientProfile& profile) {
+        addProfileToVector(profile, m_patients);
+        profile.addAssignedRoom(m_room_number);
+    }
+    /// @brief  Removes a profile from the patient vector.
+    /// @note   If no associated profile is found, prints an error to the console.
+    void removePatientProfile(PatientProfile& profile) {
+        removeProfileFromVector(profile, m_patients);
+        profile.removeAssignedRoom(m_room_number);
+    }
+    /// @brief  Takes in a profile that is to be moved from the current room to the provided room. Removes the profile from the current room.
+    /// @note   If no associated profile is found, prints an error to the console.
+    void movePatient(PatientProfile& patient_to_move, Room& new_room)
+    {
+        if (removeProfileFromVector(patient_to_move, m_patients))
+        {
+            new_room.addPatientProfile(patient_to_move);
+        }
+    }
+
+    /// @brief  Takes in a profile and adds to the end of the staff vector.
+    /// @note   Will not add a duplicate profile. Prints a warning if a blocked duplicate were to occur.
+    void addStaffProfile(StaffProfile& profile) { addProfileToVector(profile, m_staff); }
+    /// @breif  Removes a profile from the staff vector.
+    /// @note   If no associated profile is found, prints an error to the console.
+    void removeStaffProfile(StaffProfile& profile) { removeProfileFromVector(profile, m_staff); }
+    /// @brief  Takes in a profile that is to be moved from the current room to the provided room. Removes the profile from the current room.
+    /// @note   If no associated profile is found, prints an error to the console.
+    void moveStaff(StaffProfile& staff_to_move, Room& new_room)
+    {
+        if (removeProfileFromVector(staff_to_move, m_staff))
+        {
+            new_room.addStaffProfile(staff_to_move);
+        }
+    }
+
+    size_t getCurrentOccupancy() { return m_patients.size(); }
+    size_t getStaffCount() { return m_staff.size(); }
+    std::string getOccupancyStatus() { return std::format("{}/{}", getCurrentOccupancy(), m_max_occupancy); }
+};
+
+
 /// @brief  Uses a tm struct to create a timestamp based on given parameters.
 /// @return Returns a time_t object.
-inline time_t getTimestamp(size_t year, size_t month, size_t month_day);
+//inline time_t getTimestamp(size_t year, size_t month, size_t month_day, size_t hour, size_t minute, size_t second);
+//inline time_t getTimestamp(size_t year, size_t month, size_t month_day);
 
 /// @brief                  Takes in a patient profile, and two time points, and calculates if the patient has been discharged or not.
 /// @param patient_profile  The associated patient profile.
 /// @param previous_time    The previous timestamp used.
 /// @param current_time     The currently used timestamp.
-/// @return                 PatientStatus::DISCHARGED or PatientStatus::NONE
-inline PatientStatus patientAdmissionStatus(PatientProfile patient_profile, time_t previous_time, time_t current_time);
+/// @return                 PatientStatus::DISCHARGED or PatientStatus::ADMITTED
+//inline PatientStatus patientAdmissionStatus(const PatientProfile& patient_profile, const time_t& previous_time, const time_t& current_time);
 
 /// @brief                  Takes in a patient profile, cost per elapsed time unit, elapsed time, and the unit of time. Returns an estimated cost based on params.
 /// @param cost_per_time    The cost per unit time.
@@ -36,29 +173,48 @@ inline PatientStatus patientAdmissionStatus(PatientProfile patient_profile, time
 /// @param time_unit        The unit of time.
 /// @return                 An estimated cost multiplied by 100. (To avoid floating-point precision errors.)
 /// @note                   Rounds up for some calculations.
-inline size_t getCostEstimation(size_t cost_per_time, time_t elapsed_time, TimeUnit time_unit);
+//inline size_t getCostEstimation(size_t cost_per_time, time_t elapsed_time, TimeUnit time_unit);
 
-inline std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> getUpcomingShifts(StaffProfile staff_profile, time_t current_time);
+/// @brief                  Takes in a staff profile and the current time. Returns the staff profile's upcoming shifts.
+/// @param  staff_profile   The staff member's profile.
+/// @param  current_time    The current simulation time.
+/// @return                 Returns the upcoming shifts for the staff member.
+//inline std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> getUpcomingShifts(StaffProfile staff_profile, time_t current_time);
+
+//inline std::vector<Room> generateRooms(const std::vector<PatientProfile>& patients, const std::vector<StaffProfile>& staff);
 
 //*****************************************************************************************//
 //*****************************************************************************************//
 
-inline time_t getTimestamp(size_t year, size_t month, size_t month_day)
+inline time_t getTimestamp(size_t year, size_t month, size_t month_day, size_t hour, size_t minute, size_t second)
 {
-    //size_t hour, size_t minute, size_t second
-    struct tm datetime {0};
+    struct tm datetime;
     datetime.tm_year = year - 1900;
     datetime.tm_mon = month - 1;
     datetime.tm_mday = month_day;
     //datetime.tm_hour = hour;
     //datetime.tm_min = minute;
     //datetime.tm_sec = second;
+    //datetime.tm_isdst = -1;
+
+    return mktime(&datetime);
+}
+
+inline time_t getTimestamp(size_t year, size_t month, size_t month_day)
+{
+    struct tm datetime;
+    datetime.tm_year = year - 1900;
+    datetime.tm_mon = month - 1;
+    datetime.tm_mday = month_day;
+    datetime.tm_hour = 0;
+    datetime.tm_min = 0;
+    datetime.tm_sec = 0;
     datetime.tm_isdst = -1;
 
     return mktime(&datetime);
 }
 
-inline PatientStatus patientAdmissionStatus(PatientProfile patient_profile, time_t previous_time, time_t current_time)
+inline PatientStatus patientAdmissionStatus(const PatientProfile& patient_profile, const time_t& previous_time, const time_t& current_time)
 {
     time_t discharge_time{ patient_profile.getExpectedTimeOfStay() };
     bool before_previous{ (discharge_time <= previous_time) ? true : false };
@@ -66,7 +222,7 @@ inline PatientStatus patientAdmissionStatus(PatientProfile patient_profile, time
 
     if ((!before_previous && before_current) || (before_previous && before_current)) { return PatientStatus::DISCHARGED; }
 
-    return NONE;
+    return PatientStatus::ADMITTED;
 }
 
 inline size_t getCostEstimation(size_t cost_per_time, time_t elapsed_time, TimeUnit time_unit)
@@ -92,4 +248,67 @@ inline std::array<TimeBlock, MAXIMUM_STORED_SHIFTS> getUpcomingShifts(StaffProfi
     }
 
     return upcoming_shifts;
+}
+
+inline std::vector<Room> generateRooms(std::vector<PatientProfile>& patients, std::vector<StaffProfile>& staff)
+{
+    std::vector<Room> return_rooms{};
+
+    for (PatientProfile& p : patients)
+    {
+        for (std::string admitted_room : p.getAssignedRooms())
+        {
+            bool wasRoomFound{ false };
+            for (Room& room : return_rooms)
+            {
+                if (room.getRoomNumber() == admitted_room)
+                {
+                    wasRoomFound = true;
+                    room.addPatientProfile(p);
+                    break;
+                }
+            }
+            if (!wasRoomFound)
+            {
+                Room new_room{ admitted_room };
+                new_room.addPatientProfile(p);
+                return_rooms.push_back(Room(new_room));
+            }
+        }
+    }
+
+    for (StaffProfile& s : staff)
+    {
+        for (std::string assigned_room : s.getAssignedRooms())
+        {
+            bool wasRoomFound{ false };
+            for (Room& room : return_rooms)
+            {
+                if (room.getRoomNumber() == assigned_room)
+                {
+                    wasRoomFound = true;
+                    room.addStaffProfile(s);
+                    break;
+                }
+            }
+            if (!wasRoomFound)
+            {
+                Room new_room{ assigned_room };
+                new_room.addStaffProfile(s);
+                return_rooms.push_back(Room(new_room));
+            }
+        }
+    }
+
+    return return_rooms;
+}
+
+inline std::vector<Room> getUnstaffedRooms(std::vector<Room> rooms)
+{
+    std::vector<Room> unstaffed_rooms{};
+    for (Room& room : rooms)
+    {
+        if ((room.getStaff().size() == 0) && (room.getPatients().size() > 0)) { unstaffed_rooms.push_back(room); }
+    }
+    return unstaffed_rooms;
 }
