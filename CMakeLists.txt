@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(VitalVitals LANGUAGES CXX)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
 
 qt_standard_project_setup()
 
@@ -11,14 +11,6 @@ qt_add_executable(VitalVitals
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
-    resources.qrc
-
-
-)
-
-qt_add_translations(
-    TARGETS VitalVitals
-    TS_FILES VitalVitals_en_CA.ts
 )
 
 target_link_libraries(VitalVitals
