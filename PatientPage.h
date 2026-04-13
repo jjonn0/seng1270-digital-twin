@@ -45,12 +45,15 @@ public:
 
 		m_unitLabel = new wxStaticText(m_patPage, wxID_ANY, "Select Unit:");
 		m_genderLabel = new wxStaticText(m_patPage, wxID_ANY, "Select Gender: ");
+		// Initializes the components of the patient page
 
 		wxArrayString unitOptions;
 		unitOptions.Add("GENERAL");  unitOptions.Add("ER"); unitOptions.Add("ICU"); unitOptions.Add("CARDIAC"); unitOptions.Add("NEURO"); unitOptions.Add("POST_OP");
 		unitOptions.Add("GERIATRIC"); unitOptions.Add("TRAUMA"); unitOptions.Add("NEPHRO"); unitOptions.Add("PSHYC"); unitOptions.Add("ONCOLOGY"); unitOptions.Add("PALLIATIVE");
+		// Creates an array of strings representing different hospital units
 		wxArrayString gendersOpt;
 		gendersOpt.Add("Male"); gendersOpt.Add("Female"); gendersOpt.Add("Other");
+		// Creates arrays of strings for unit
 
 		m_unitChoice = new wxChoice(m_patPage, wxID_ANY, wxDefaultPosition, wxDefaultSize, unitOptions);
 		m_genderChoice = new wxChoice(m_patPage, wxID_ANY, wxDefaultPosition, wxDefaultSize ,gendersOpt);
@@ -105,12 +108,11 @@ public:
 		m_patPage->SetSizer(m_patSizer);
 		m_profSizer->Add(m_notebook1, 1, wxEXPAND, 0);
 		this->SetSizer(m_profSizer);
+		// Sets the styles and layout for the patient page
 
 	}
 	void UpdateDisplay(const std::vector<PatientProfile>& patient, const std::vector<StaffProfile>& staff, wxDateTime currenttime, wxString unit = "") {
-		//m_listControl->DeleteAllItems();
 		m_patientTot = "";
-		wxArrayString unitOptions;
 		m_staffPage->UpdateDisplay(staff, currenttime);
 		wxDateTime simNow(currenttime);
 		for (const auto& pat : patient) {
@@ -127,15 +129,13 @@ public:
 			wxString genderName = m_genderChoice->GetString((int)g);
 			m_patientTot += wxString::Format("Patient: %s\nAge: %d\nReason %s\nID: %llu\nUnit: %s\nGender: %s\n\n", fullName, age, reason, pat.getProfileNumber(),unitName, genderName);
 			m_patientLabel->SetLabel(m_patientTot);
-
-			//int row = m_listControl->InsertItem(m_listControl->GetItemCount(), m_patientTot);
-			//m_listcontrol->SetItem(row, 1, wxString::Format("%d", age));
-
+			// Updates the display of patient information on the patient page, including their name, age, reason for admission, ID, assigned unit,
 		}
 		int width = m_scrolledWindow1->GetClientSize().GetWidth();
 		if (width > 0) {
 			m_patientLabel->Wrap(width);
 		}
+		
 		m_scrolledWindow1->FitInside();
 		m_scrolledWindow1->Scroll(0, m_scrolledWindow1->GetScrollLines(wxVERTICAL));
 		m_scrollSizer->Layout();
