@@ -20,7 +20,6 @@ struct columnNames {
     std::string c_reason_of_admission{ "Reason of admission" };
     std::string c_time_of_admission{ "Time of admission" };
     std::string c_expected_time_of_stay{ "Expected time of stay" };
-    std::string c_creation_date{ "Creation date" };
     std::string c_admitted_unit{ "Admitted unit" };
     std::string c_occupation{ "Occupation" };
     std::string c_wage{ "Wage" };
@@ -28,8 +27,8 @@ struct columnNames {
     std::string c_assigned_unit{ "Assigned unit" };
     std::string c_gender{ "Gender" };
     std::string c_assigned_rooms{ "Assigned rooms" };
-} columns;
-
+}; 
+inline columnNames columns;
 class FileHandler
 {
 private:
@@ -56,7 +55,6 @@ public:
             std::string read_reason_of_admission{ file.GetCell<std::string>(columns.c_reason_of_admission, i) };
             std::string read_time_of_admission{ file.GetCell<std::string>(columns.c_time_of_admission, i) };
             std::string read_expected_time_of_stay{ file.GetCell<std::string>(columns.c_expected_time_of_stay, i) };
-            std::string read_creation_date{ file.GetCell<std::string>(columns.c_creation_date, i) };
             std::string read_admitted_unit{ file.GetCell<std::string>(columns.c_admitted_unit, i) };
             std::string read_gender{ file.GetCell<std::string>(columns.c_gender, i) };
             std::string read_assigned_rooms{ file.GetCell<std::string>(columns.c_assigned_rooms, i) };
@@ -70,7 +68,6 @@ public:
                 read_reason_of_admission = encdec.decrypt(password, read_reason_of_admission);
                 read_time_of_admission = encdec.decrypt(password, read_time_of_admission);
                 read_expected_time_of_stay = encdec.decrypt(password, read_expected_time_of_stay);
-                read_creation_date = encdec.decrypt(password, read_creation_date);
                 read_admitted_unit = encdec.decrypt(password, read_admitted_unit);
                 read_gender = encdec.decrypt(password, read_gender);
                 read_assigned_rooms = encdec.decrypt(password, read_assigned_rooms);
@@ -83,7 +80,6 @@ public:
             std::string reason_of_admission = read_reason_of_admission;
             time_t time_of_admission = stoull(read_time_of_admission);
             time_t expected_time_of_stay = stoull(read_expected_time_of_stay);
-            time_t creation_date = stoull(read_creation_date);
             Unit assigned_unit = static_cast<Unit>(stoi(read_admitted_unit));
             Gender gender = static_cast<Gender>(stoi(read_gender));
             std::vector<std::string> assigned_rooms = parseIntoRooms(read_assigned_rooms);
@@ -144,7 +140,6 @@ public:
             std::string read_assigned_unit{ file.GetCell<std::string>(columns.c_assigned_unit, i) };
             std::string read_assigned_rooms{ file.GetCell<std::string>(columns.c_assigned_rooms, i) };
             std::string read_gender{ file.GetCell<std::string>(columns.c_gender, i) };
-            std::string read_creation_date{ file.GetCell<std::string>(columns.c_creation_date, i) };
 
             if (password != "")
             {
@@ -158,7 +153,6 @@ public:
                 read_assigned_unit = encdec.decrypt(password, read_assigned_unit);
                 read_assigned_rooms = encdec.decrypt(password, read_assigned_rooms);
                 read_gender = encdec.decrypt(password, read_gender);
-                read_creation_date = encdec.decrypt(password, read_creation_date);
             }
 
             size_t profile_number = stoull(read_profile_number);
@@ -171,7 +165,6 @@ public:
             Unit assigned_unit = static_cast<Unit>(stoi(read_assigned_unit));
             Gender gender = static_cast<Gender>(stoi(read_gender));
             std::vector<std::string> assigned_rooms = parseIntoRooms(read_assigned_rooms);
-            time_t creation_date = stoull(read_creation_date);
             profiles.emplace_back(profile_number, first_name, last_name, dob, occupation, wage, assigned_unit, gender, shifts, assigned_rooms);
         }
         return profiles;
@@ -186,9 +179,8 @@ public:
         std::string reason{ patient.getReasonOfAdmission() };
         std::string admission_time{ std::to_string(patient.getTimeOfAdmission()) };
         std::string expected_stay_time{ std::to_string(patient.getExpectedTimeOfStay()) };
-        std::string creation_date{ std::to_string(patient.getCreationDate()) };
         std::string admitted_unit{ std::to_string(patient.getAdmittedUnitInt()) };
-        std::string gender{std::to_string(patient.getGender()) };
+        std::string gender{ std::to_string(patient.getGender()) };
         std::string assigned_rooms{ patient.getRoomString() };
 
         // If a password is entered, encrypt the output
@@ -201,10 +193,10 @@ public:
             reason = encdec.encrypt(password, reason);
             admission_time = encdec.encrypt(password, admission_time);
             expected_stay_time = encdec.encrypt(password, expected_stay_time);
-            creation_date = encdec.encrypt(password, creation_date);
             admitted_unit = encdec.encrypt(password, admitted_unit);
             gender = encdec.encrypt(password, gender);
             assigned_rooms = encdec.encrypt(password, assigned_rooms);
+
         }
 
         file.SetCell(0, row, profile_number);
@@ -214,10 +206,9 @@ public:
         file.SetCell(4, row, reason);
         file.SetCell(5, row, admission_time);
         file.SetCell(6, row, expected_stay_time);
-        file.SetCell(7, row, creation_date);
-        file.SetCell(8, row, admitted_unit);
-        file.SetCell(9, row, gender);
-        file.SetCell(10, row, assigned_rooms);
+        file.SetCell(7, row, admitted_unit);
+        file.SetCell(8, row, gender);
+        file.SetCell(9, row, assigned_rooms);
         file.Save();
     }
 
@@ -233,7 +224,7 @@ public:
         std::string assigned_unit{ std::to_string(staff.getAssignedUnit()) };
         std::string gender{ std::to_string(staff.getGender()) };
         std::string assigned_rooms{ staff.getRoomString() };
-        //std::string creation_date{ std::to_string(staff.getCreationDate()) };
+
 
         // If a password is entered, encrypt the output
         if (password != "")
@@ -248,7 +239,6 @@ public:
             assigned_unit = encdec.encrypt(password, assigned_unit);
             gender = encdec.encrypt(password, gender);
             assigned_rooms = encdec.encrypt(password, assigned_rooms);
-            //creation_date = encdec.encrypt(password, creation_date);
         }
 
         file.SetCell(0, row, profile_number);
@@ -291,7 +281,7 @@ public:
     /// @param password The encryption password
     static void saveStaffData(StaffProfile staff, std::string filename, std::string password) {
         EncDec encdec;
-        rapidcsv::Document file(filename);
+        rapidcsv::Document file(filename, rapidcsv::LabelParams(0,-1));
         if (file.GetRowCount() == 0)
         {
             for (size_t row{ 0 }; row < file.GetRowCount(); row++) {
@@ -369,10 +359,9 @@ public:
             file.SetColumnName(4, columns.c_reason_of_admission);
             file.SetColumnName(5, columns.c_time_of_admission);
             file.SetColumnName(6, columns.c_expected_time_of_stay);
-            file.SetColumnName(7, columns.c_creation_date);
-            file.SetColumnName(8, columns.c_admitted_unit);
-            file.SetColumnName(9, columns.c_gender);
-            file.SetColumnName(10, columns.c_assigned_rooms);
+            file.SetColumnName(7, columns.c_admitted_unit);
+            file.SetColumnName(8, columns.c_gender);
+            file.SetColumnName(9, columns.c_assigned_rooms);
             file.Save();
             return true;
         }
@@ -413,9 +402,9 @@ public:
         for (size_t index{ 0 }; index < file.GetRowCount(); index++) {
             if (profile_number == file.GetCell<size_t>(columns.c_profile_number, index)) {
                 file.RemoveRow(index);
+				file.Save();   
                 return;
             }
         }
     }
-
 };
