@@ -19,6 +19,8 @@ public:
 	time_t getSimTime() {
 		return wxDateTime::Now().GetTicks() + m_timeDif;
 	};
+	void ChangePassword(wxCommandEvent& evt);
+
 
 
 
