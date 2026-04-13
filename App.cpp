@@ -7,14 +7,14 @@ wxIMPLEMENT_APP(App);
 
 bool App::OnInit() 
 {
-	wxString password = "Secret";
+	wxString password = "";
 	bool passwordCorrect = false;
 	while (!passwordCorrect) {
 		wxPasswordEntryDialog login(nullptr, "Enter System Password:", "VitalVitals Login");
 
 		if (login.ShowModal() == wxID_OK) {
 			password = login.GetValue();
-			if (password == "Secret") {
+			if (password == "Pass123") {
 				passwordCorrect = true;
 			}
 			else {
@@ -22,7 +22,7 @@ bool App::OnInit()
 			}
 		}
 		else {
-			return false; // User cancelled the login dialog
+			return false;
 		}
 	}
 
